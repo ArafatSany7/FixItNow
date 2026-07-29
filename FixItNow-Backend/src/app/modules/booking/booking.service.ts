@@ -1,6 +1,7 @@
 import prisma from '../../../shared/prisma';
 import ApiError from '../../errors/ApiError';
 import httpStatus from 'http-status';
+import { BookingStatus } from '@prisma/client';
 
 const createBooking = async (userEmail: string, payload: any) => {
   const customer = await prisma.user.findUnique({ where: { email: userEmail } });
@@ -15,6 +16,21 @@ const createBooking = async (userEmail: string, payload: any) => {
 
   if (!technician) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Technician not found');
+  }
+
+  const existingBooking = await prisma.booking.findFirst({
+    where: {
+      technicianId: payload.technicianId,
+      date: new Date(payload.date),
+      timeSlot: payload.timeSlot,
+      status: {
+        notIn: [BookingStatus.CANCELLED, BookingStatus.DECLINED]
+      }
+    }
+  });
+
+  if (existingBooking) {
+    throw new ApiError(httpStatus.CONFLICT, 'This time slot is already booked for the selected technician');
   }
 
   const result = await prisma.booking.create({
@@ -130,13 +146,13 @@ const cancelBooking = async (userEmail: string, bookingId: string) => {
     throw new ApiError(httpStatus.FORBIDDEN, 'You are not authorized to cancel this booking');
   }
 
-  if (booking.status !== 'PENDING' && booking.status !== 'ACCEPTED') {
+  if (booking.status !== BookingStatus.PENDING && booking.status !== BookingStatus.ACCEPTED) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'You can only cancel PENDING or ACCEPTED bookings');
   }
 
   const result = await prisma.booking.update({
     where: { id: bookingId },
-    data: { status: 'CANCELLED' },
+    data: { status: BookingStatus.CANCELLED },
   });
 
   return result;

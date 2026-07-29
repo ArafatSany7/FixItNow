@@ -71,9 +71,28 @@ const changeUserStatus = async (id: string, isBanned: boolean) => {
   return userData;
 };
 
+const getAdminStats = async () => {
+  const totalUsers = await prisma.user.count({ where: { role: 'CUSTOMER' } });
+  const totalTechnicians = await prisma.user.count({ where: { role: 'TECHNICIAN' } });
+  const totalBookings = await prisma.booking.count();
+  
+  const paymentStats = await prisma.payment.aggregate({
+    _sum: { amount: true },
+    where: { status: 'PAID' }
+  });
+
+  return {
+    totalUsers,
+    totalTechnicians,
+    totalBookings,
+    totalRevenue: paymentStats._sum.amount || 0,
+  };
+};
+
 export const UserService = {
   getMyProfile,
   updateMyProfile,
   getAllUsers,
   changeUserStatus,
+  getAdminStats,
 };

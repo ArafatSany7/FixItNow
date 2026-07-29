@@ -33,4 +33,10 @@ router.patch(
   UserController.changeUserStatus
 );
 
+router.get(
+  '/admin/stats',
+  auth(Role.ADMIN),
+  UserController.getAdminStats
+);
+
 export const UserRoutes = router;

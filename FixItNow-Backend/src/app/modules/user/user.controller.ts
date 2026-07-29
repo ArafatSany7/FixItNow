@@ -50,9 +50,21 @@ const changeUserStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAdminStats = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.getAdminStats();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Admin statistics retrieved successfully',
+    data: result,
+  });
+});
+
 export const UserController = {
   getMyProfile,
   updateMyProfile,
   getAllUsers,
   changeUserStatus,
+  getAdminStats,
 };
