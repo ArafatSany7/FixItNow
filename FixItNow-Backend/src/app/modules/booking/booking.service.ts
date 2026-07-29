@@ -113,9 +113,39 @@ const changeBookingStatus = async (userEmail: string, bookingId: string, status:
   return result;
 };
 
+const cancelBooking = async (userEmail: string, bookingId: string) => {
+  const customer = await prisma.user.findUnique({ where: { email: userEmail } });
+
+  if (!customer || customer.role !== 'CUSTOMER') {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Only customers can cancel their bookings');
+  }
+
+  const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
+
+  if (!booking) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Booking not found');
+  }
+
+  if (booking.customerId !== customer.id) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'You are not authorized to cancel this booking');
+  }
+
+  if (booking.status !== 'PENDING' && booking.status !== 'ACCEPTED') {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'You can only cancel PENDING or ACCEPTED bookings');
+  }
+
+  const result = await prisma.booking.update({
+    where: { id: bookingId },
+    data: { status: 'CANCELLED' },
+  });
+
+  return result;
+};
+
 export const BookingService = {
   createBooking,
   getCustomerBookings,
   getTechnicianBookings,
   changeBookingStatus,
+  cancelBooking,
 };

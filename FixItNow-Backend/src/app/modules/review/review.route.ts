@@ -14,4 +14,9 @@ router.post(
   ReviewController.createReview
 );
 
+router.get(
+  '/technician/:technicianId',
+  ReviewController.getReviewsByTechnicianId
+);
+
 export const ReviewRoutes = router;

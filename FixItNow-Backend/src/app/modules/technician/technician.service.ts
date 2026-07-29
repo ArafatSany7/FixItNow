@@ -120,6 +120,11 @@ const getAllTechnicians = async (query: any) => {
           contactNo: true,
           address: true,
           profileImg: true,
+          reviewsReceived: {
+            select: {
+              rating: true,
+            },
+          },
         },
       },
     },
@@ -129,13 +134,33 @@ const getAllTechnicians = async (query: any) => {
     where: whereConditions,
   });
 
+  // Calculate average rating and review count
+  const dataWithRatings = result.map((profile) => {
+    const reviews = profile.user.reviewsReceived || [];
+    const reviewCount = reviews.length;
+    const averageRating =
+      reviewCount > 0
+        ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+        : 0;
+
+    // Remove reviewsReceived from the final output
+    const { reviewsReceived, ...userWithoutReviews } = profile.user as any;
+
+    return {
+      ...profile,
+      user: userWithoutReviews,
+      averageRating: Number(averageRating.toFixed(1)),
+      reviewCount,
+    };
+  });
+
   return {
     meta: {
       page: Number(page),
       limit: Number(limit),
       total,
     },
-    data: result,
+    data: dataWithRatings,
   };
 };
 

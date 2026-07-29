@@ -49,4 +49,20 @@ const createReview = async (userEmail: string, payload: any) => {
 
 export const ReviewService = {
   createReview,
+  getReviewsByTechnicianId: async (technicianId: string) => {
+    const result = await prisma.review.findMany({
+      where: { technicianId },
+      include: {
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            profileImg: true,
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    return result;
+  }
 };

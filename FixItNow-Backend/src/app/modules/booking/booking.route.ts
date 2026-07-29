@@ -33,4 +33,10 @@ router.patch(
   BookingController.changeBookingStatus
 );
 
+router.patch(
+  '/:id/cancel',
+  auth(Role.CUSTOMER),
+  BookingController.cancelBooking
+);
+
 export const BookingRoutes = router;
