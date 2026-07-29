@@ -17,7 +17,7 @@ const createReview = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getReviewsByTechnicianId = catchAsync(async (req: Request, res: Response) => {
-  const result = await ReviewService.getReviewsByTechnicianId(req.params.technicianId);
+  const result = await ReviewService.getReviewsByTechnicianId(req.params.technicianId as string);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
