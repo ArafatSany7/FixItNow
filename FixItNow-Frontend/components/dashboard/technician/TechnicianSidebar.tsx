@@ -2,25 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarClock, CreditCard, Settings, LogOut, Home } from "lucide-react";
+import { LayoutDashboard, CalendarDays, Wallet, Settings, LogOut, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function CustomerSidebar() {
+export function TechnicianSidebar() {
   const pathname = usePathname();
 
   const links = [
     { href: "/", label: "Home", icon: Home },
-    { href: "/dashboard/customer", label: "Overview", icon: LayoutDashboard },
-    { href: "/dashboard/customer/bookings", label: "Booking History", icon: CalendarClock },
-    { href: "/dashboard/customer/payments", label: "Payments", icon: CreditCard },
-    { href: "/dashboard/customer/settings", label: "Settings", icon: Settings },
+    { href: "/dashboard/technician", label: "Booking Requests", icon: LayoutDashboard },
+    { href: "/dashboard/technician/availability", label: "Availability", icon: CalendarDays },
+    { href: "/dashboard/technician/profile", label: "Profile & Services", icon: Wallet },
+    { href: "/dashboard/technician/settings", label: "Settings", icon: Settings },
   ];
 
   return (
     <div className="flex flex-col h-full bg-background border border-secondary/20 rounded-2xl p-4 shadow-sm">
       <div className="mb-8 px-4 mt-2">
-        <h2 className="text-xl font-bold text-text">Customer Portal</h2>
-        <p className="text-sm text-text/60 mt-1">Manage your home services</p>
+        <h2 className="text-xl font-bold text-text">Technician Portal</h2>
+        <p className="text-sm text-text/60 mt-1">Manage your service business</p>
       </div>
 
       <nav className="flex-1 space-y-2">
