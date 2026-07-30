@@ -3,6 +3,40 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: #f5f9fa;
+    --foreground: #0b1319;
+    --text: #0b1319;
+
+    --primary: #2c5568;
+    --primary-foreground: #ffffff;
+
+    --secondary: #89b6cd;
+    --secondary-foreground: #0b1319;
+
+    --accent: #66996b;
+    --accent-foreground: #ffffff;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: #05090a;
+    --foreground: #e6eef4;
+    --text: #e6eef4;
+
+    --primary: #97c0d3;
+    --primary-foreground: #05090a;
+
+    --secondary: #325f76;
+    --secondary-foreground: #e6eef4;
+
+    --accent: #66996b;
+    --accent-foreground: #05090a;
+  }
+}
+
+@layer base {
   body {
     @apply bg-background text-text antialiased;
   }

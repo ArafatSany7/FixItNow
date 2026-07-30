@@ -62,7 +62,7 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel className="text-text">Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="Email" {...field} className="bg-secondary/10 border-secondary/30 focus-visible:ring-primary h-12" />
+                    <Input placeholder="Email" {...field} className="bg-transparent border-secondary text-text placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-primary h-12" />
                   </FormControl>
                   <FormMessage className="text-accent" />
                 </FormItem>
@@ -80,7 +80,7 @@ export function LoginForm() {
                         type={showPassword ? "text" : "password"} 
                         placeholder="Enter your password" 
                         {...field} 
-                        className="bg-secondary/10 border-secondary/30 focus-visible:ring-primary h-12 pr-10" 
+                        className="bg-transparent border-secondary text-text placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-primary h-12 pr-10" 
                       />
                       <button
                         type="button"
@@ -107,8 +107,8 @@ export function LoginForm() {
         <div className="flex-1 border-t border-secondary/30" />
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-4">
-        <Button variant="outline" className="h-12 border-secondary/30 bg-secondary/5 hover:bg-secondary/10">
+      <div className="mt-6 flex justify-center">
+        <Button variant="outline" className="w-full h-12 border-secondary bg-transparent hover:bg-secondary/10">
           <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -128,12 +128,6 @@ export function LoginForm() {
             />
           </svg>
           Google
-        </Button>
-        <Button variant="outline" className="h-12 border-secondary/30 bg-secondary/5 hover:bg-secondary/10">
-          <svg className="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.04 2.26-.74 3.58-.76 1.48-.02 2.76.62 3.52 1.68-3.08 1.83-2.58 5.79.52 7.02-.75 1.76-1.53 3.12-2.7 4.23zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-          </svg>
-          Apple
         </Button>
       </div>
     </motion.div>

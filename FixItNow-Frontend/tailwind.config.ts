@@ -6,23 +6,24 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        background: '#05090a',
-        foreground: '#e6eef4',
-        text: '#e6eef4',
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        text: 'var(--text)',
         primary: {
-          DEFAULT: '#97c0d3',
-          foreground: '#05090a'
+          DEFAULT: 'var(--primary)',
+          foreground: 'var(--primary-foreground)'
         },
         secondary: {
-          DEFAULT: '#325f76',
-          foreground: '#e6eef4'
+          DEFAULT: 'var(--secondary)',
+          foreground: 'var(--secondary-foreground)'
         },
         accent: {
-          DEFAULT: '#66996b',
-          foreground: '#05090a'
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)'
         }
       },
     },

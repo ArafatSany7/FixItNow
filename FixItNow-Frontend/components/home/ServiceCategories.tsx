@@ -30,10 +30,10 @@ const itemVariants = {
 
 export function ServiceCategories() {
   return (
-    <section className="w-full py-16 md:py-24 lg:py-32 bg-background border-t border-secondary/20">
+    <section className="w-full py-16 md:py-24 lg:py-32 bg-background  border-t border-secondary/20">
       <div className="container px-4 md:px-6 mx-auto">
         <div className="flex flex-col items-center justify-center text-center space-y-4 mb-12">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -42,7 +42,7 @@ export function ServiceCategories() {
           >
             Explore <span className="text-primary">Categories</span>
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -53,7 +53,7 @@ export function ServiceCategories() {
           </motion.p>
         </div>
 
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
