@@ -33,8 +33,8 @@ async function getTechnicians() {
       technician: {
         name: tech.user?.name || "Technician",
         avatar: tech.user?.profileImg || "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop",
-        rating: 4.8, 
-        reviews: 12,
+        rating: tech.averageRating || 0, 
+        reviews: tech.reviewCount || 0,
       },
       price: tech.pricing || 0,
       location: tech.user?.address || "Available Locally",

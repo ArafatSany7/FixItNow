@@ -52,9 +52,15 @@ export function Navbar() {
         </Link>
 
         <div className="hidden md:flex md:items-center md:gap-6">
-          <Link href="/services" className="text-sm font-medium text-text/80 transition-colors hover:text-primary">
-            Services
-          </Link>
+          {userRole === "TECHNICIAN" ? (
+            <Link href="/dashboard/technician/ongoing" className="text-sm font-medium text-text/80 transition-colors hover:text-primary">
+              Ongoing Bookings
+            </Link>
+          ) : (
+            <Link href="/services" className="text-sm font-medium text-text/80 transition-colors hover:text-primary">
+              Services
+            </Link>
+          )}
           <Link href="/about" className="text-sm font-medium text-text/80 transition-colors hover:text-primary">
             About Us
           </Link>
@@ -110,13 +116,23 @@ export function Navbar() {
             className="container mx-auto px-4 overflow-hidden md:hidden border-b border-secondary/50 bg-background/95 backdrop-blur"
           >
             <div className="flex flex-col space-y-4 py-4">
-              <Link
-                href="/services"
-                className="text-sm font-medium text-text/80 transition-colors hover:text-primary"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Services
-              </Link>
+              {userRole === "TECHNICIAN" ? (
+                <Link
+                  href="/dashboard/technician/ongoing"
+                  className="text-sm font-medium text-text/80 transition-colors hover:text-primary"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Ongoing Bookings
+                </Link>
+              ) : (
+                <Link
+                  href="/services"
+                  className="text-sm font-medium text-text/80 transition-colors hover:text-primary"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Services
+                </Link>
+              )}
               <Link
                 href="/about"
                 className="text-sm font-medium text-text/80 transition-colors hover:text-primary"

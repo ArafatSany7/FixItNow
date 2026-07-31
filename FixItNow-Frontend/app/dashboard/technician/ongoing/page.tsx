@@ -1,5 +1,5 @@
-import { BookingManagement } from "@/components/dashboard/technician/BookingManagement";
 import { cookies } from "next/headers";
+import { OngoingBookings } from "@/components/dashboard/technician/OngoingBookings";
 
 async function getIncomingBookings() {
   const token = cookies().get("accessToken")?.value;
@@ -21,21 +21,21 @@ async function getIncomingBookings() {
   }
 }
 
-export default async function TechnicianDashboardOverview() {
+export default async function OngoingBookingsPage() {
   const allBookings = await getIncomingBookings();
   
-  // Filter for only PENDING requests for the main dashboard
-  const pendingRequests = allBookings.filter((b: any) => b.status === "PENDING");
+  // Filter for only non-pending requests (ACCEPTED, COMPLETED)
+  const ongoingBookings = allBookings.filter((b: any) => b.status !== "PENDING" && b.status !== "DECLINED" && b.status !== "CANCELLED");
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-text">Booking Requests</h1>
-        <p className="text-text/60">Review and manage your incoming service requests.</p>
+        <h1 className="text-2xl font-bold text-text">Ongoing Bookings</h1>
+        <p className="text-text/60">View your accepted jobs and check their payment status.</p>
       </div>
 
       <div className="pt-2">
-        <BookingManagement initialBookings={pendingRequests} />
+        <OngoingBookings bookings={ongoingBookings} />
       </div>
     </div>
   );

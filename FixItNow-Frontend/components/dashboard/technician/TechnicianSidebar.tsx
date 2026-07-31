@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, Wallet, Settings, LogOut, Home } from "lucide-react";
+import { LayoutDashboard, CalendarDays, Wallet, Settings, LogOut, Home, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function TechnicianSidebar() {
@@ -11,6 +11,7 @@ export function TechnicianSidebar() {
   const links = [
     { href: "/", label: "Home", icon: Home },
     { href: "/dashboard/technician", label: "Booking Requests", icon: LayoutDashboard },
+    { href: "/dashboard/technician/ongoing", label: "Ongoing Bookings", icon: Briefcase },
     { href: "/dashboard/technician/availability", label: "Availability", icon: CalendarDays },
     { href: "/dashboard/technician/profile", label: "Profile & Services", icon: Wallet },
     { href: "/dashboard/technician/settings", label: "Settings", icon: Settings },
