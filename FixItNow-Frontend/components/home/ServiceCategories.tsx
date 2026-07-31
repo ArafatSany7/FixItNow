@@ -1,17 +1,19 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Wrench, Zap, Sparkles, Monitor, Hammer, PaintRoller } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import Link from "next/link";
 
-const categories = [
-  { name: "Plumbing", icon: Wrench, desc: "Leaks, pipes, and installations" },
-  { name: "Electrical", icon: Zap, desc: "Wiring, repairs, and lighting" },
-  { name: "Cleaning", icon: Sparkles, desc: "Deep cleaning and maid services" },
-  { name: "Appliance Repair", icon: Monitor, desc: "AC, Fridge, and TV repairs" },
-  { name: "Carpentry", icon: Hammer, desc: "Furniture and woodworks" },
-  { name: "Painting", icon: PaintRoller, desc: "Interior and exterior painting" },
-];
+interface Category {
+  id: string;
+  title: string;
+  description: string;
+  icon?: string;
+}
+
+interface ServiceCategoriesProps {
+  categories: Category[];
+}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,9 +30,9 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-export function ServiceCategories() {
+export function ServiceCategories({ categories }: ServiceCategoriesProps) {
   return (
-    <section className="w-full py-16 md:py-24 lg:py-32 bg-background  border-t border-secondary/20">
+    <section className="w-full py-16 md:py-24 lg:py-32 bg-background border-t border-secondary/20">
       <div className="container px-4 md:px-6 mx-auto">
         <div className="flex flex-col items-center justify-center text-center space-y-4 mb-12">
           <motion.h2
@@ -60,26 +62,23 @@ export function ServiceCategories() {
           viewport={{ once: true, margin: "-100px" }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {categories.map((category, index) => {
-            const Icon = category.icon;
-            return (
-              <motion.div key={index} variants={itemVariants}>
-                <Link href={`/services?category=${category.name.toLowerCase()}`}>
-                  <div className="group relative overflow-hidden rounded-xl border border-secondary/30 bg-background/50 p-6 hover:bg-secondary/10 hover:border-primary/50 transition-all duration-300">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/20 text-primary group-hover:scale-110 transition-transform duration-300">
-                        <Icon className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg text-text group-hover:text-primary transition-colors">{category.name}</h3>
-                        <p className="text-sm text-text/60">{category.desc}</p>
-                      </div>
+          {categories.map((category) => (
+            <motion.div key={category.id} variants={itemVariants}>
+              <Link href={`/services?category=${category.title.toLowerCase()}`}>
+                <div className="group relative overflow-hidden rounded-xl border border-secondary/30 bg-background/50 p-6 hover:bg-secondary/10 hover:border-primary/50 transition-all duration-300">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/20 text-primary group-hover:scale-110 transition-transform duration-300">
+                      <Sparkles className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-text group-hover:text-primary transition-colors">{category.title}</h3>
+                      <p className="text-sm text-text/60">{category.description || 'Professional home service'}</p>
                     </div>
                   </div>
-                </Link>
-              </motion.div>
-            );
-          })}
+                </div>
+              </Link>
+            </motion.div>
+          ))}
         </motion.div>
       </div>
     </section>

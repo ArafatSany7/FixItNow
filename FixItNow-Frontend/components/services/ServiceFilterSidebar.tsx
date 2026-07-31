@@ -4,10 +4,20 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, RefreshCcw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export function ServiceFilterSidebar() {
+interface Category {
+  id: string;
+  title: string;
+  description: string;
+}
+
+interface ServiceFilterSidebarProps {
+  categories: Category[];
+}
+
+export function ServiceFilterSidebar({ categories }: ServiceFilterSidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -27,12 +37,18 @@ export function ServiceFilterSidebar() {
     if (maxPrice) params.set("maxPrice", maxPrice);
     else params.delete("maxPrice");
 
-    router.push(`?${params.toString()}`);
+    window.history.pushState(null, '', `?${params.toString()}`);
+  };
+
+  const handleResetFilters = () => {
+    setSelectedCategory("");
+    setMinPrice("");
+    setMaxPrice("");
+    window.history.pushState(null, '', `/services`);
   };
 
   return (
     <>
-      {/* Mobile Toggle */}
       <div className="md:hidden mb-4">
         <Button 
           variant="outline" 
@@ -55,7 +71,6 @@ export function ServiceFilterSidebar() {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Search */}
         <div className="space-y-3">
           <h3 className="font-semibold text-text">Search Services</h3>
           <div className="relative">
@@ -69,31 +84,33 @@ export function ServiceFilterSidebar() {
 
         <div className="h-px bg-secondary/20 w-full" />
 
-        {/* Categories */}
         <div className="space-y-3">
           <h3 className="font-semibold text-text">Categories</h3>
           <div className="space-y-2">
-            {["Plumbing", "Electrical", "Cleaning", "Appliance Repair", "Carpentry", "Painting"].map((cat) => {
-              const isActive = selectedCategory.toLowerCase() === cat.toLowerCase();
-              return (
-                <label key={cat} className="flex items-center gap-2 cursor-pointer">
-                  <input 
-                    type="radio" 
-                    name="category"
-                    checked={isActive}
-                    onChange={() => setSelectedCategory(cat)}
-                    className="rounded-full border-secondary/30 text-primary focus:ring-primary bg-secondary/10" 
-                  />
-                  <span className={`text-sm transition-colors ${isActive ? "text-primary font-medium" : "text-text/80 hover:text-primary"}`}>{cat}</span>
-                </label>
-              );
-            })}
+            {categories.length === 0 ? (
+              <div className="text-sm text-text/50 py-2">No categories available</div>
+            ) : (
+              categories.map((cat) => {
+                const isActive = selectedCategory.toLowerCase() === cat.title.toLowerCase();
+                return (
+                  <label key={cat.id} className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="category"
+                      checked={isActive}
+                      onChange={() => setSelectedCategory(cat.title)}
+                      className="rounded-full border-secondary/30 text-primary focus:ring-primary bg-secondary/10" 
+                    />
+                    <span className={`text-sm transition-colors ${isActive ? "text-primary font-medium" : "text-text/80 hover:text-primary"}`}>{cat.title}</span>
+                  </label>
+                );
+              })
+            )}
           </div>
         </div>
 
         <div className="h-px bg-secondary/20 w-full" />
 
-        {/* Price Range */}
         <div className="space-y-3">
           <h3 className="font-semibold text-text">Price Range (Starting)</h3>
           <div className="flex gap-2 items-center">
@@ -115,9 +132,14 @@ export function ServiceFilterSidebar() {
           </div>
         </div>
 
-        <Button onClick={handleApplyFilters} className="w-full bg-primary text-background hover:bg-primary/90 h-11">
-          Apply Filters
-        </Button>
+        <div className="flex gap-2 pt-2">
+          <Button onClick={handleResetFilters} variant="outline" className="w-full border-secondary/50 text-text/80 hover:bg-secondary/10 h-11 flex items-center justify-center gap-2">
+            <RefreshCcw className="h-4 w-4" /> Reset
+          </Button>
+          <Button onClick={handleApplyFilters} className="w-full bg-primary text-background hover:bg-primary/90 h-11">
+            Apply
+          </Button>
+        </div>
       </motion.div>
     </>
   );

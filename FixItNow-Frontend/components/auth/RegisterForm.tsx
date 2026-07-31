@@ -10,6 +10,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import api from "@/lib/api";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   role: z.enum(["customer", "technician"], { required_error: "Please select your role." }),
@@ -23,6 +26,9 @@ const formSchema = z.object({
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,8 +41,24 @@ export function RegisterForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setIsLoading(true);
+      const payload = {
+        name: `${values.firstName} ${values.lastName}`.trim(),
+        email: values.email,
+        password: values.password,
+        role: values.role.toUpperCase(),
+      };
+      
+      await api.post('/auth/register', payload);
+      toast.success("Account created successfully! Please log in.");
+      router.push('/login');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to create account.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -180,8 +202,8 @@ export function RegisterForm() {
             )}
           />
 
-          <Button type="submit" className="w-full bg-primary text-background hover:bg-primary/90 h-12 text-base font-semibold mt-2">
-            Create account
+          <Button type="submit" disabled={isLoading} className="w-full h-12 bg-primary hover:bg-primary/90 text-background text-base font-bold shadow-lg shadow-primary/20">
+            {isLoading ? "Creating account..." : "Create Account"}
           </Button>
         </form>
       </Form>
