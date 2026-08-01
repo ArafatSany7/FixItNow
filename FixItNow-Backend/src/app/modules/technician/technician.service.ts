@@ -134,7 +134,6 @@ const getAllTechnicians = async (query: any) => {
     where: whereConditions,
   });
 
-  // Calculate average rating and review count
   const dataWithRatings = result.map((profile) => {
     const reviews = profile.user.reviewsReceived || [];
     const reviewCount = reviews.length;
@@ -143,7 +142,6 @@ const getAllTechnicians = async (query: any) => {
         ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
         : 0;
 
-    // Remove reviewsReceived from the final output
     const { reviewsReceived, ...userWithoutReviews } = profile.user as any;
 
     return {

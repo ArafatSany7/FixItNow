@@ -1,6 +1,11 @@
 "use client";
 
 import { MapPin, Calendar, Clock, Banknote, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { toast } from "sonner";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 interface Booking {
   id: string;
@@ -51,7 +56,47 @@ const getStatusBadge = (status: string, paymentStatus?: string) => {
   }
 };
 
-export function OngoingBookings({ bookings }: OngoingBookingsProps) {
+export function OngoingBookings({ bookings: initialBookings }: OngoingBookingsProps) {
+  const [bookings, setBookings] = useState<Booking[]>(initialBookings || []);
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleAction = async (id: string, action: 'IN_PROGRESS' | 'COMPLETED') => {
+    try {
+      setIsProcessing(id);
+      const token = Cookies.get("accessToken");
+      
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/bookings/${id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token || '',
+        },
+        body: JSON.stringify({ status: action })
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to update booking status");
+      }
+
+      toast.success(`Job ${action === 'IN_PROGRESS' ? 'Started' : 'Completed'}`, {
+        description: `You have successfully updated the job status.`,
+      });
+
+      // Update the local state
+      setBookings(prev => prev.map(b => b.id === id ? { ...b, status: action } : b));
+      router.refresh();
+      
+    } catch (error: any) {
+      toast.error("Error", {
+        description: error.message || "An unexpected error occurred.",
+      });
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 gap-6">
       {bookings.map((req) => (
@@ -103,6 +148,35 @@ export function OngoingBookings({ bookings }: OngoingBookingsProps) {
                 <p className="text-sm text-text/60">Awaiting customer action</p>
               </div>
             )}
+            
+            {/* Technician Actions */}
+            <div className="mt-5 pt-5 border-t border-secondary/10">
+              {req.payment?.status === "PAID" && req.status === "ACCEPTED" && (
+                <Button 
+                  className="w-full bg-green-600 hover:bg-green-700 text-white shadow-sm"
+                  onClick={() => handleAction(req.id, "IN_PROGRESS")}
+                  disabled={isProcessing === req.id}
+                >
+                  {isProcessing === req.id ? "Processing..." : "Start Job"}
+                </Button>
+              )}
+              
+              {req.status === "IN_PROGRESS" && (
+                <Button 
+                  className="w-full bg-gray-600 hover:bg-gray-700 text-white shadow-sm"
+                  onClick={() => handleAction(req.id, "COMPLETED")}
+                  disabled={isProcessing === req.id}
+                >
+                  {isProcessing === req.id ? "Processing..." : "Complete Job"}
+                </Button>
+              )}
+              
+              {req.status === "COMPLETED" && (
+                <div className="w-full py-2 text-center bg-gray-500/10 text-gray-600 rounded-md text-sm font-semibold border border-gray-500/20">
+                  Job Completed
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ))}

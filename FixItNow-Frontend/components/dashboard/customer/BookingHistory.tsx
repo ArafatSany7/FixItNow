@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { ReviewModal } from "./ReviewModal";
 
 interface Booking {
   id: string;
@@ -57,6 +58,11 @@ const getStatusBadge = (status: string, paymentStatus?: string) => {
 export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
+  
+  // Review Modal State
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedBookingForReview, setSelectedBookingForReview] = useState<string>("");
+  
   const router = useRouter();
 
   const handleCancel = async (id: string) => {
@@ -78,16 +84,54 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
         throw new Error(errorData.message || "Failed to cancel booking");
       }
 
-      toast.success("Booking cancelled", {
-        description: "Your service request has been cancelled.",
+      toast.success("Booking Cancelled", {
+        description: "Your booking request has been cancelled.",
       });
 
+      // Update the local state
       setBookings(prev => prev.map(b => b.id === id ? { ...b, status: "CANCELLED" } : b));
       router.refresh();
       
     } catch (error: any) {
       toast.error("Error", {
         description: error.message || "An unexpected error occurred.",
+      });
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
+  const handlePayment = async (bookingId: string) => {
+    try {
+      setIsProcessing(bookingId);
+      const token = Cookies.get("accessToken");
+      
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/payment/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token || '',
+        },
+        body: JSON.stringify({ bookingId })
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to initialize payment");
+      }
+
+      const data = await res.json();
+      
+      if (data.data?.url) {
+        window.open(data.data.url, '_blank');
+        toast.info("Payment Initiated", {
+          description: "Please complete the payment in the new tab. Refresh this page after payment.",
+        });
+      }
+      
+    } catch (error: any) {
+      toast.error("Payment Error", {
+        description: error.message || "Could not start payment process.",
       });
     } finally {
       setIsProcessing(null);
@@ -133,21 +177,24 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
               </td>
               <td className="p-4 text-right">
                 {(booking.status === "PENDING" || booking.status === "REQUESTED") && (
-                  <Button 
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
                     onClick={() => handleCancel(booking.id)}
                     disabled={isProcessing === booking.id}
-                    variant="outline" 
-                    size="sm" 
-                    className="border-accent text-accent hover:bg-accent hover:text-background h-8"
                   >
-                    {isProcessing === booking.id ? "Cancelling..." : "Cancel"}
+                    {isProcessing === booking.id ? "Canceling..." : "Cancel"}
                   </Button>
                 )}
-                {booking.status === "ACCEPTED" && (!booking.payment || booking.payment.status !== "PAID") && (
-                  <Button asChild size="sm" className="bg-primary text-background hover:bg-primary/90 h-8 shadow-sm">
-                    <Link href={`/dashboard/customer/bookings/${booking.id}/pay`}>
-                      Pay Now
-                    </Link>
+                {booking.status === "ACCEPTED" && booking.payment?.status !== "PAID" && (
+                  <Button
+                    size="sm"
+                    className="bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-500/20"
+                    onClick={() => handlePayment(booking.id)}
+                    disabled={isProcessing === booking.id}
+                  >
+                    {isProcessing === booking.id ? "Processing..." : "Pay Now"}
                   </Button>
                 )}
                 {booking.payment?.status === "PAID" && booking.status !== "COMPLETED" && (
@@ -155,8 +202,17 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
                     Paid
                   </span>
                 )}
+
                 {booking.status === "COMPLETED" && (
-                  <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary/10 h-8">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-primary text-primary hover:bg-primary hover:text-background shadow-sm"
+                    onClick={() => {
+                      setSelectedBookingForReview(booking.id);
+                      setIsReviewModalOpen(true);
+                    }}
+                  >
                     Leave Review
                   </Button>
                 )}
@@ -165,6 +221,16 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
           ))}
         </tbody>
       </table>
+      
+      {/* Review Modal */}
+      <ReviewModal 
+        isOpen={isReviewModalOpen}
+        onClose={() => {
+          setIsReviewModalOpen(false);
+          setSelectedBookingForReview("");
+        }}
+        bookingId={selectedBookingForReview}
+      />
     </div>
   );
 }
