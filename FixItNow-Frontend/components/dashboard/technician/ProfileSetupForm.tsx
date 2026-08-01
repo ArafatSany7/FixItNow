@@ -19,26 +19,56 @@ export function ProfileSetupForm() {
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
   const [profileImg, setProfileImg] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/categories`, {
+        const token = Cookies.get("accessToken");
+        // Fetch Categories
+        const catRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/categories`, {
           cache: 'no-store'
         });
-        const data = await res.json();
-        if (data.data) {
-          setCategories(data.data);
-          if (data.data.length > 0) {
-            setCategoryId(data.data[0].id);
+        const catData = await catRes.json();
+        let defaultCategoryId = "";
+        if (catData.data) {
+          setCategories(catData.data);
+          if (catData.data.length > 0) {
+            defaultCategoryId = catData.data[0].id;
           }
         }
+
+        // Fetch Existing Profile
+        if (token) {
+          const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/users/profile`, {
+            headers: { Authorization: token },
+            cache: 'no-store'
+          });
+          const profileData = await profileRes.json();
+          if (profileData.data) {
+            const user = profileData.data;
+            if (user.profileImg) setProfileImg(user.profileImg);
+            
+            if (user.technicianProfile) {
+              const tech = user.technicianProfile;
+              setCategoryId(tech.categoryId || defaultCategoryId);
+              setBio(tech.bio || "");
+              setExperience(tech.experience || 1);
+              setPricing(tech.pricing || 50);
+              setSkills(tech.skills || []);
+            } else {
+              setCategoryId(defaultCategoryId);
+            }
+          }
+        } else {
+          setCategoryId(defaultCategoryId);
+        }
       } catch (error) {
-        console.error("Failed to fetch categories");
+        console.error("Failed to fetch data");
       }
     };
-    fetchCategories();
+    fetchData();
   }, []);
 
   const handleAddSkill = () => {
@@ -55,10 +85,11 @@ export function ProfileSetupForm() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("Image too large", { description: "Please upload an image smaller than 2MB" });
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image too large", { description: "Please upload an image smaller than 5MB" });
         return;
       }
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileImg(reader.result as string);
@@ -118,15 +149,44 @@ export function ProfileSetupForm() {
       });
 
 
-      if (profileImg) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/users/profile`, {
+      let finalProfileImg = profileImg;
+
+      if (selectedFile) {
+        toast.info("Uploading image to Cloudinary...", { id: "uploading-image" });
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'fixitnow');
+        
+        try {
+          const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'demo'}/image/upload`, {
+            method: 'POST',
+            body: formData
+          });
+          const uploadData = await uploadRes.json();
+          if (uploadData.secure_url) {
+            finalProfileImg = uploadData.secure_url;
+            toast.dismiss("uploading-image");
+          } else {
+             toast.error("Cloudinary upload failed", { id: "uploading-image" });
+          }
+        } catch(e) {
+          toast.error("Failed to upload to Cloudinary", { id: "uploading-image" });
+        }
+      }
+
+      if (finalProfileImg) {
+        const imgRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/users/profile`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
             Authorization: token || '',
           },
-          body: JSON.stringify({ profileImg })
+          body: JSON.stringify({ profileImg: finalProfileImg })
         });
+        
+        if (!imgRes.ok) {
+          toast.error("Profile saved, but picture failed to upload to backend. Try an image URL.");
+        }
       }
 
       router.refresh();
