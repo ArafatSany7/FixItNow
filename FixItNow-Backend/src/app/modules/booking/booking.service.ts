@@ -24,7 +24,7 @@ const createBooking = async (userEmail: string, payload: any) => {
       date: new Date(payload.date),
       timeSlot: payload.timeSlot,
       status: {
-        notIn: [BookingStatus.CANCELLED, BookingStatus.DECLINED]
+        in: [BookingStatus.PENDING, BookingStatus.ACCEPTED, BookingStatus.IN_PROGRESS]
       }
     }
   });
