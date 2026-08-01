@@ -177,12 +177,6 @@ const getAllBookings = async () => {
           contactNo: true,
         },
       },
-      service: {
-        select: {
-          id: true,
-          title: true,
-        },
-      },
       payment: true,
     },
     orderBy: { createdAt: 'desc' },

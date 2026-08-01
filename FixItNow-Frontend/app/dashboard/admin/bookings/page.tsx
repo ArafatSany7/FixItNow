@@ -15,10 +15,16 @@ async function getAllBookings() {
       headers: { Authorization: token },
       cache: "no-store",
     });
-    if (!res.ok) return [];
+    console.log("Admin Bookings Fetch Status:", res.status, res.statusText);
+    if (!res.ok) {
+      const err = await res.text();
+      console.log("Admin Bookings Fetch Error:", err);
+      return [];
+    }
     const data = await res.json();
     return data?.data || [];
   } catch (error) {
+    console.log("Admin Bookings Fetch Exception:", error);
     return [];
   }
 }
