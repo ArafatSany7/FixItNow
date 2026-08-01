@@ -4,20 +4,30 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, Clock } from "lucide-react";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
-export function BookingCalendar() {
+interface BookingCalendarProps {
+  technicianId: string;
+}
+
+export function BookingCalendar({ technicianId }: BookingCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<number>(0);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [isBooking, setIsBooking] = useState(false);
+  const router = useRouter();
 
-  // Generate next 7 days for our horizontal calendar
+
   const next7Days = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i);
+    d.setHours(0, 0, 0, 0);
     return {
       index: i,
       dayName: d.toLocaleDateString("en-US", { weekday: "short" }),
       dateNumber: d.getDate(),
       fullDate: d.toLocaleDateString(),
+      isoDate: d.toISOString(),
     };
   });
 
@@ -25,11 +35,52 @@ export function BookingCalendar() {
     "09:00 AM", "10:30 AM", "01:00 PM", "02:30 PM", "04:00 PM"
   ];
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
     if (!selectedTime) return;
-    toast.success("Booking Requested!", {
-      description: `Your request for ${next7Days[selectedDate].fullDate} at ${selectedTime} has been sent.`,
-    });
+
+    setIsBooking(true);
+    const token = Cookies.get("accessToken");
+
+    if (!token) {
+      toast.error("Authentication required", { description: "Please log in to book a service." });
+      setIsBooking(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token || '',
+        },
+        body: JSON.stringify({
+          technicianId,
+          date: next7Days[selectedDate].isoDate,
+          timeSlot: selectedTime
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to book service");
+      }
+
+      toast.success("Booking Requested!", {
+        description: `Your request for ${next7Days[selectedDate].fullDate} at ${selectedTime} has been sent.`,
+      });
+
+      setSelectedTime(null);
+      router.push("/dashboard/customer");
+
+    } catch (error: any) {
+      toast.error("Booking Failed", {
+        description: error.message || "Could not complete booking.",
+      });
+    } finally {
+      setIsBooking(false);
+    }
   };
 
   return (
@@ -50,11 +101,11 @@ export function BookingCalendar() {
                 key={day.index}
                 onClick={() => {
                   setSelectedDate(day.index);
-                  setSelectedTime(null); // reset time on day change
+                  setSelectedTime(null);
                 }}
                 className={`flex flex-col items-center justify-center min-w-[4rem] p-2 rounded-xl border transition-all ${isSelected
-                    ? "border-primary bg-primary text-background shadow-md"
-                    : "border-secondary/30 bg-background text-text hover:border-primary/50"
+                  ? "border-primary bg-primary text-background shadow-md"
+                  : "border-secondary/30 bg-background text-text hover:border-primary/50"
                   }`}
               >
                 <span className="text-xs font-semibold uppercase opacity-80">{day.dayName}</span>
@@ -79,8 +130,8 @@ export function BookingCalendar() {
                 key={time}
                 onClick={() => setSelectedTime(time)}
                 className={`py-2 px-3 rounded-lg border text-sm font-medium transition-all ${isSelected
-                    ? "border-primary bg-primary/10 text-primary shadow-sm"
-                    : "border-secondary/30 bg-transparent text-text hover:border-primary/50"
+                  ? "border-primary bg-primary/10 text-primary shadow-sm"
+                  : "border-secondary/30 bg-transparent text-text hover:border-primary/50"
                   }`}
               >
                 {time}
@@ -92,10 +143,10 @@ export function BookingCalendar() {
 
       <Button
         onClick={handleBooking}
-        disabled={!selectedTime}
+        disabled={!selectedTime || isBooking}
         className="w-full bg-primary text-background hover:bg-primary/90 h-12 text-base font-semibold"
       >
-        Request Booking
+        {isBooking ? "Booking..." : "Request Booking"}
       </Button>
       <p className="text-xs text-center text-text/50 mt-3">
         You won't be charged until the technician accepts.

@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Star } from "lucide-react";
+import { Star, X } from "lucide-react";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
@@ -22,6 +20,8 @@ export function ReviewModal({ isOpen, onClose, bookingId }: ReviewModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
+  if (!isOpen) return null;
+
   const handleSubmit = async () => {
     if (rating === 0) {
       toast.error("Rating required", { description: "Please select a star rating." });
@@ -35,7 +35,7 @@ export function ReviewModal({ isOpen, onClose, bookingId }: ReviewModalProps) {
     try {
       setIsSubmitting(true);
       const token = Cookies.get("accessToken");
-      
+
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/reviews`, {
         method: 'POST',
         headers: {
@@ -58,7 +58,7 @@ export function ReviewModal({ isOpen, onClose, bookingId }: ReviewModalProps) {
         description: "Thank you for your feedback!",
       });
 
-      // Reset state and close modal
+
       setRating(0);
       setComment("");
       onClose();
@@ -74,16 +74,23 @@ export function ReviewModal({ isOpen, onClose, bookingId }: ReviewModalProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-background border border-secondary/20 rounded-2xl shadow-lg">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-text">Rate Your Experience</DialogTitle>
-          <DialogDescription className="text-text/60">
-            Please share your feedback to help us maintain a high standard of service!
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="py-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="bg-background border border-secondary/20 rounded-2xl shadow-lg w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="p-6 relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-text/50 hover:text-text rounded-full p-1 hover:bg-secondary/10 transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+          <div className="mb-5">
+            <h2 className="text-xl font-bold text-text mb-1">Rate Your Experience</h2>
+            <p className="text-sm text-text/60">
+              Please share your feedback to help us maintain a high standard of service!
+            </p>
+          </div>
+
           <div className="flex justify-center gap-2 mb-6">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -95,44 +102,43 @@ export function ReviewModal({ isOpen, onClose, bookingId }: ReviewModalProps) {
                 onClick={() => setRating(star)}
               >
                 <Star
-                  className={`h-10 w-10 ${
-                    star <= (hoveredRating || rating)
+                  className={`h-10 w-10 ${star <= (hoveredRating || rating)
                       ? "fill-yellow-400 text-yellow-400"
                       : "text-secondary/30"
-                  }`}
+                    }`}
                 />
               </button>
             ))}
           </div>
 
-          <Textarea
+          <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="Tell us what you liked or what could be improved..."
-            className="min-h-[120px] bg-secondary/5 border-secondary/20 focus-visible:ring-primary rounded-xl"
+            className="w-full min-h-[120px] p-3 text-sm bg-secondary/5 border border-secondary/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 text-text placeholder:text-text/40 resize-y"
           />
-        </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-3 sm:space-x-0">
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full border-secondary/20 text-text/80 hover:bg-secondary/10"
-            onClick={onClose}
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            className="w-full bg-primary text-background hover:bg-primary/90 shadow-md"
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Submit Review"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <div className="flex flex-col sm:flex-row gap-3 mt-6">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full border-secondary/20 text-text/80 hover:bg-secondary/10"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="w-full bg-primary text-background hover:bg-primary/90 shadow-md"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Submit Review"}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

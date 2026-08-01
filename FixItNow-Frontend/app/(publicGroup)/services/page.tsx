@@ -6,6 +6,9 @@ export const metadata = {
   description: "Browse and book professional home services",
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getCategories() {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/categories`, {

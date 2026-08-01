@@ -130,7 +130,7 @@ export function TechnicianProfile({ technician, reviews }: TechnicianProfileProp
         transition={{ delay: 0.4 }}
         className="lg:col-span-1"
       >
-        <BookingCalendar />
+        <BookingCalendar technicianId={technician.userId} />
       </motion.div>
 
     </div>

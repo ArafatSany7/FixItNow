@@ -106,7 +106,7 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
       setIsProcessing(bookingId);
       const token = Cookies.get("accessToken");
       
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/payment/create`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/payments/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

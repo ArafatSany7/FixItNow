@@ -1,19 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Save, Plus, X } from "lucide-react";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export function ProfileSetupForm() {
   const [isSaving, setIsSaving] = useState(false);
-  const [category, setCategory] = useState("Electrical");
-  const [bio, setBio] = useState("With over 10 years of experience in residential and commercial electrical systems...");
-  const [skills, setSkills] = useState(["Panel Upgrades", "Wiring", "Smart Home"]);
+  const [categories, setCategories] = useState<{ id: string, title: string }[]>([]);
+  const [categoryId, setCategoryId] = useState("");
+  const [bio, setBio] = useState("");
+  const [experience, setExperience] = useState(1);
+  const [pricing, setPricing] = useState(50);
+  const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
+  const router = useRouter();
 
-  const categories = ["Plumbing", "Electrical", "Cleaning", "Appliance Repair", "Carpentry", "Painting"];
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/categories`);
+        const data = await res.json();
+        if (data.data) {
+          setCategories(data.data);
+          if (data.data.length > 0) {
+            setCategoryId(data.data[0].id);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories");
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleAddSkill = () => {
     if (newSkill.trim() && !skills.includes(newSkill.trim())) {
@@ -26,16 +48,64 @@ export function ProfileSetupForm() {
     setSkills(skills.filter(s => s !== skillToRemove));
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSaving(true);
+    if (!categoryId) {
+      toast.error("Please select a category");
+      return;
+    }
 
-    setTimeout(() => {
-      setIsSaving(false);
-      toast.success("Profile Updated", {
-        description: "Your category and service details have been saved.",
+    setIsSaving(true);
+    const token = Cookies.get("accessToken");
+    const payload = {
+      categoryId,
+      skills,
+      experience: Number(experience),
+      pricing: Number(pricing)
+    };
+
+    try {
+
+      let res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/technicians/profile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token || '',
+        },
+        body: JSON.stringify(payload)
       });
-    }, 1500);
+
+      if (res.status === 400 || res.status === 409) {
+        res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/technicians/profile`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token || '',
+          },
+          body: JSON.stringify({
+            skills,
+            experience: Number(experience),
+            pricing: Number(pricing)
+          })
+        });
+      }
+
+      if (!res.ok) {
+        throw new Error("Failed to save profile");
+      }
+
+      toast.success("Profile Updated", {
+        description: "Your service details have been saved.",
+      });
+      router.refresh();
+
+    } catch (error: any) {
+      toast.error("Error", {
+        description: error.message || "Failed to update profile",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -48,8 +118,8 @@ export function ProfileSetupForm() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {categories.map((cat) => (
             <label
-              key={cat}
-              className={`flex items-center justify-center p-3 rounded-xl border cursor-pointer transition-all ${category === cat
+              key={cat.id}
+              className={`flex items-center justify-center p-3 rounded-xl border cursor-pointer transition-all ${categoryId === cat.id
                 ? "border-primary bg-primary/10 text-primary font-medium"
                 : "border-secondary/30 bg-transparent text-text/70 hover:border-primary/50"
                 }`}
@@ -58,10 +128,10 @@ export function ProfileSetupForm() {
                 type="radio"
                 name="category"
                 className="hidden"
-                checked={category === cat}
-                onChange={() => setCategory(cat)}
+                checked={categoryId === cat.id}
+                onChange={() => setCategoryId(cat.id)}
               />
-              {cat}
+              {cat.title}
             </label>
           ))}
         </div>
@@ -70,16 +140,32 @@ export function ProfileSetupForm() {
       <div className="h-px w-full bg-secondary/20" />
 
       <div className="space-y-4">
-        <h3 className="text-lg font-bold text-text">About Me (Bio)</h3>
-        <p className="text-sm text-text/60">Write a short description to tell customers about your experience.</p>
-        <textarea
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-          rows={4}
-          className="w-full bg-transparent border border-secondary/30 rounded-xl p-4 text-text focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-          placeholder="Tell customers why they should hire you..."
-          required
-        />
+        <h3 className="text-lg font-bold text-text">Experience & Pricing</h3>
+        <p className="text-sm text-text/60">Set your professional experience and base hourly pricing.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm text-text/70 mb-1">Years of Experience</label>
+            <Input
+              type="number"
+              min="0"
+              value={experience}
+              onChange={(e) => setExperience(Number(e.target.value))}
+              className="bg-transparent border-secondary/30"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-text/70 mb-1">Base Pricing (Hourly $)</label>
+            <Input
+              type="number"
+              min="0"
+              value={pricing}
+              onChange={(e) => setPricing(Number(e.target.value))}
+              className="bg-transparent border-secondary/30"
+              required
+            />
+          </div>
+        </div>
       </div>
 
       <div className="h-px w-full bg-secondary/20" />
