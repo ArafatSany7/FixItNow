@@ -28,6 +28,29 @@ interface OngoingBookingsProps {
   bookings: Booking[];
 }
 
+const getStatusBadge = (status: string, paymentStatus?: string) => {
+  if (status === "ACCEPTED" && paymentStatus === "PAID") {
+    return <span className="bg-purple-500/10 text-purple-600 border border-purple-500/20 px-3 py-1 rounded-full text-xs font-semibold">Paid</span>;
+  }
+  switch (status) {
+    case "PENDING":
+    case "REQUESTED":
+      return <span className="bg-orange-500/10 text-orange-600 border border-orange-500/20 px-3 py-1 rounded-full text-xs font-semibold">Requested</span>;
+    case "ACCEPTED":
+      return <span className="bg-blue-500/10 text-blue-600 border border-blue-500/20 px-3 py-1 rounded-full text-xs font-semibold">Accepted</span>;
+    case "DECLINED":
+      return <span className="bg-red-500/10 text-red-600 border border-red-500/20 px-3 py-1 rounded-full text-xs font-semibold">Declined</span>;
+    case "IN_PROGRESS":
+      return <span className="bg-green-500/10 text-green-600 border border-green-500/20 px-3 py-1 rounded-full text-xs font-semibold">In Progress</span>;
+    case "COMPLETED":
+      return <span className="bg-gray-500/10 text-gray-600 border border-gray-500/20 px-3 py-1 rounded-full text-xs font-semibold">Completed</span>;
+    case "CANCELLED":
+      return <span className="bg-red-900/10 text-red-800 border border-red-900/20 px-3 py-1 rounded-full text-xs font-semibold">Cancelled</span>;
+    default:
+      return <span className="bg-secondary/10 text-text border border-secondary/20 px-3 py-1 rounded-full text-xs font-semibold">{status}</span>;
+  }
+};
+
 export function OngoingBookings({ bookings }: OngoingBookingsProps) {
   return (
     <div className="grid grid-cols-1 gap-6">
@@ -35,10 +58,8 @@ export function OngoingBookings({ bookings }: OngoingBookingsProps) {
         <div key={req.id} className="bg-background border border-secondary/20 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row gap-6">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-xs font-semibold">
-                {req.status}
-              </span>
-              <span className="text-sm text-text/50">ID: {req.id.split('-')[0]}</span>
+              {getStatusBadge(req.status, req.payment?.status)}
+              <span className="text-sm text-text/50">ID: {req.id.slice(0, 8)}</span>
             </div>
             <h3 className="text-xl font-bold text-text mb-4">Service Request</h3>
             

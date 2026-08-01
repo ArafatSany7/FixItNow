@@ -13,19 +13,26 @@ interface Booking {
   payment: { amount: number } | null;
 }
 
-const getStatusBadge = (status: string) => {
+const getStatusBadge = (status: string, paymentStatus?: string) => {
+
+  if (status === "ACCEPTED" && paymentStatus === "PAID") {
+    return <span className="bg-purple-500/10 text-purple-600 border border-purple-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">Paid</span>;
+  }
+
   switch (status) {
     case "PENDING":
     case "REQUESTED":
-      return <span className="bg-yellow-500/10 text-yellow-600 border border-yellow-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">Pending</span>;
+      return <span className="bg-orange-500/10 text-orange-600 border border-orange-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">Requested</span>;
     case "ACCEPTED":
       return <span className="bg-blue-500/10 text-blue-600 border border-blue-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">Accepted</span>;
+    case "DECLINED":
+      return <span className="bg-red-500/10 text-red-600 border border-red-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">Declined</span>;
     case "IN_PROGRESS":
-      return <span className="bg-blue-500/10 text-blue-600 border border-blue-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">In Progress</span>;
+      return <span className="bg-green-500/10 text-green-600 border border-green-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">In Progress</span>;
     case "COMPLETED":
-      return <span className="bg-green-500/10 text-green-600 border border-green-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">Completed</span>;
+      return <span className="bg-gray-500/10 text-gray-600 border border-gray-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">Completed</span>;
     case "CANCELLED":
-      return <span className="bg-red-500/10 text-red-600 border border-red-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">Cancelled</span>;
+      return <span className="bg-red-900/10 text-red-800 border border-red-900/20 px-2.5 py-1 rounded-full text-xs font-semibold">Cancelled</span>;
     default:
       return <span className="bg-secondary/10 text-text border border-secondary/20 px-2.5 py-1 rounded-full text-xs font-semibold">{status}</span>;
   }
@@ -66,19 +73,16 @@ export function BookingMonitoring({ initialBookings = [], showAll = false, custo
               </tr>
             ) : (
               displayedBookings.map((booking) => (
-                <tr key={booking.id} className="hover:bg-secondary/5 transition-colors">
-                  <td className="p-4 font-medium text-text">{booking.id.split("-")[0]}</td>
-                  <td className="p-4 text-text/80">{booking.customer?.name || "Unknown"}</td>
-                  <td className="p-4 text-text/80">{booking.technician?.name || "Unassigned"}</td>
-                  <td className="p-4 text-text/80 max-w-[200px] truncate" title={booking.service?.title}>
-                    {booking.service?.title || "N/A"}
-                  </td>
+                <tr key={booking.id} className="border-b border-secondary/10 hover:bg-secondary/5 transition-colors">
+                  <td className="p-4 font-medium text-text">{booking.id.slice(0, 8)}</td>
+                  <td className="p-4 text-text/80">{booking.customer?.name || "N/A"}</td>
+                  <td className="p-4 text-text/80">{booking.technician?.name || "N/A"}</td>
+                  {/* Fallback to checking technician category title if service title isn't directly attached */}
+                  <td className="p-4 text-text/80">{booking.service?.title || (booking.technician as any)?.technicianProfile?.category?.title || "N/A"}</td>
                   <td className="p-4">
-                    {getStatusBadge(booking.status)}
+                    {getStatusBadge(booking.status, (booking as any).payment?.status)}
                   </td>
-                  <td className="p-4 font-semibold text-text">
-                    ${booking.payment?.amount || 0}
-                  </td>
+                  <td className="p-4 text-text font-medium">${booking.payment?.amount || 0}</td>
                 </tr>
               ))
             )}

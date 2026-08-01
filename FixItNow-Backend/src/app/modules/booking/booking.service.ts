@@ -175,6 +175,15 @@ const getAllBookings = async () => {
           name: true,
           email: true,
           contactNo: true,
+          technicianProfile: {
+            include: {
+              category: {
+                select: {
+                  title: true,
+                },
+              },
+            },
+          },
         },
       },
       payment: true,
