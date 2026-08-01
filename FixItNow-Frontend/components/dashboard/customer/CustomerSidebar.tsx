@@ -2,18 +2,26 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarClock, CreditCard, Settings, LogOut, Home } from "lucide-react";
+import { LayoutDashboard, CalendarClock, CreditCard, LogOut, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export function CustomerSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    Cookies.remove("accessToken");
+    router.push("/login");
+    router.refresh();
+  };
 
   const links = [
     { href: "/", label: "Home", icon: Home },
     { href: "/dashboard/customer", label: "Overview", icon: LayoutDashboard },
     { href: "/dashboard/customer/bookings", label: "Booking History", icon: CalendarClock },
     { href: "/dashboard/customer/payments", label: "Payments", icon: CreditCard },
-    { href: "/dashboard/customer/settings", label: "Settings", icon: Settings },
   ];
 
   return (
@@ -45,7 +53,11 @@ export function CustomerSidebar() {
       </nav>
 
       <div className="pt-4 border-t border-secondary/20 mt-4">
-        <Button variant="ghost" className="w-full justify-start text-accent hover:text-accent hover:bg-accent/10 px-4">
+        <Button 
+          variant="ghost" 
+          onClick={handleLogout}
+          className="w-full justify-start text-accent hover:text-accent hover:bg-accent/10 px-4"
+        >
           <LogOut className="h-5 w-5 mr-3" />
           Log Out
         </Button>

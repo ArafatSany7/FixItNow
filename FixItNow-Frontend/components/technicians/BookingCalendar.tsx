@@ -9,9 +9,10 @@ import { useRouter } from "next/navigation";
 
 interface BookingCalendarProps {
   technicianId: string;
+  availability?: Record<string, string[]>;
 }
 
-export function BookingCalendar({ technicianId }: BookingCalendarProps) {
+export function BookingCalendar({ technicianId, availability = {} }: BookingCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<number>(0);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isBooking, setIsBooking] = useState(false);
@@ -25,15 +26,17 @@ export function BookingCalendar({ technicianId }: BookingCalendarProps) {
     return {
       index: i,
       dayName: d.toLocaleDateString("en-US", { weekday: "short" }),
+      fullDayName: d.toLocaleDateString("en-US", { weekday: "long" }),
       dateNumber: d.getDate(),
       fullDate: d.toLocaleDateString(),
       isoDate: d.toISOString(),
     };
   });
 
-  const availableSlots = [
-    "09:00 AM", "10:30 AM", "01:00 PM", "02:30 PM", "04:00 PM"
-  ];
+  const selectedDayName = next7Days[selectedDate].fullDayName;
+  const availableSlots = availability && availability[selectedDayName] && availability[selectedDayName].length > 0 
+    ? availability[selectedDayName]
+    : [];
 
   const handleBooking = async () => {
     if (!selectedTime) return;
@@ -72,6 +75,7 @@ export function BookingCalendar({ technicianId }: BookingCalendarProps) {
       });
 
       setSelectedTime(null);
+      router.refresh();
       router.push("/dashboard/customer");
 
     } catch (error: any) {
@@ -123,21 +127,25 @@ export function BookingCalendar({ technicianId }: BookingCalendarProps) {
           <span>Available Slots</span>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          {availableSlots.map((time) => {
-            const isSelected = selectedTime === time;
-            return (
-              <button
+          {availableSlots.length > 0 ? (
+            availableSlots.map((time) => (
+              <Button
                 key={time}
-                onClick={() => setSelectedTime(time)}
-                className={`py-2 px-3 rounded-lg border text-sm font-medium transition-all ${isSelected
-                  ? "border-primary bg-primary/10 text-primary shadow-sm"
-                  : "border-secondary/30 bg-transparent text-text hover:border-primary/50"
+                variant="outline"
+                className={`border-secondary/30 ${selectedTime === time
+                    ? "bg-primary text-background border-primary"
+                    : "hover:border-primary/50 text-text/80"
                   }`}
+                onClick={() => setSelectedTime(time)}
               >
                 {time}
-              </button>
-            );
-          })}
+              </Button>
+            ))
+          ) : (
+            <div className="col-span-2 text-center text-text/50 py-4 text-sm">
+              Not available on this date
+            </div>
+          )}
         </div>
       </div>
 

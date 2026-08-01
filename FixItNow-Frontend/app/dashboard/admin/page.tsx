@@ -7,7 +7,7 @@ async function getAdminStats() {
   if (!token) return null;
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://fixitnow-theta.vercel.app/api"}/users/admin-stats`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://fixitnow-theta.vercel.app/api"}/users/admin/stats`, {
       headers: { Authorization: token },
       cache: "no-store",
     });

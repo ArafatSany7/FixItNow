@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Star, MapPin, BadgeCheck, ShieldCheck, Zap } from "lucide-react";
+import { Star, MapPin, BadgeCheck, ShieldCheck, Zap, User } from "lucide-react";
 import { BookingCalendar } from "./BookingCalendar";
+import Image from "next/image";
 
 interface TechnicianProfileProps {
   technician: any;
@@ -22,11 +23,11 @@ export function TechnicianProfile({ technician, reviews }: TechnicianProfileProp
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col sm:flex-row gap-6 items-start sm:items-center bg-background border border-secondary/20 p-6 rounded-2xl shadow-sm"
         >
-          <div className="h-24 w-24 rounded-full bg-secondary/20 flex items-center justify-center text-primary text-3xl font-bold border-4 border-background shadow-md overflow-hidden">
+          <div className="relative h-24 w-24 rounded-full bg-secondary/20 flex items-center justify-center text-primary text-3xl font-bold border-4 border-background shadow-md overflow-hidden">
             {technician?.user?.profileImg ? (
-              <img src={technician.user.profileImg} alt={technician.user.name} className="h-full w-full object-cover" />
+              <Image src={technician.user.profileImg} alt={technician.user.name} fill className="object-cover" />
             ) : (
-              technician?.user?.name?.charAt(0) || "T"
+              <User className="h-12 w-12 text-primary" />
             )}
           </div>
           <div className="flex-1">
@@ -127,10 +128,8 @@ export function TechnicianProfile({ technician, reviews }: TechnicianProfileProp
       <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.4 }}
-        className="lg:col-span-1"
       >
-        <BookingCalendar technicianId={technician.userId} />
+        <BookingCalendar technicianId={technician.userId} availability={technician.availability} />
       </motion.div>
 
     </div>

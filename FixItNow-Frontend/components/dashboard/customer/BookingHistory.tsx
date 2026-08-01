@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ interface Booking {
     amount: number;
     status: string;
   } | null;
+  review?: { id: string } | null;
 }
 
 interface BookingHistoryProps {
@@ -58,25 +59,44 @@ const getStatusBadge = (status: string, paymentStatus?: string) => {
 export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
-  
+
   // Review Modal State
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedBookingForReview, setSelectedBookingForReview] = useState<string>("");
-  
+
   const router = useRouter();
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "payment_success" && data.bookingId) {
+          toast.success("Payment Successful!");
+          setBookings(prev => prev.map(b =>
+            b.id === data.bookingId
+              ? { ...b, payment: { ...b.payment, status: "PAID" } as any }
+              : b
+          ));
+          router.refresh();
+        }
+      } catch (e) {
+
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [router]);
 
   const handleCancel = async (id: string) => {
     try {
       setIsProcessing(id);
       const token = Cookies.get("accessToken");
-      
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://fixitnow-theta.vercel.app/api"}/bookings/${id}/status`, {
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://fixitnow-theta.vercel.app/api"}/bookings/${id}/cancel`, {
         method: "PATCH",
         headers: {
-          "Content-Type": "application/json",
           Authorization: token || "",
-        },
-        body: JSON.stringify({ status: "CANCELLED" })
+        }
       });
 
       if (!res.ok) {
@@ -88,10 +108,9 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
         description: "Your booking request has been cancelled.",
       });
 
-      // Update the local state
       setBookings(prev => prev.map(b => b.id === id ? { ...b, status: "CANCELLED" } : b));
       router.refresh();
-      
+
     } catch (error: any) {
       toast.error("Error", {
         description: error.message || "An unexpected error occurred.",
@@ -102,10 +121,11 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
   };
 
   const handlePayment = async (bookingId: string) => {
+    const paymentWindow = window.open('about:blank', '_blank', 'width=800,height=600');
     try {
       setIsProcessing(bookingId);
       const token = Cookies.get("accessToken");
-      
+
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/payments/create`, {
         method: 'POST',
         headers: {
@@ -121,15 +141,15 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
       }
 
       const data = await res.json();
-      
-      if (data.data?.url) {
-        window.open(data.data.url, '_blank');
-        toast.info("Payment Initiated", {
-          description: "Please complete the payment in the new tab. Refresh this page after payment.",
-        });
+
+      if (data.data?.url && paymentWindow) {
+        paymentWindow.location.href = data.data.url;
+      } else if (paymentWindow) {
+        paymentWindow.close();
       }
-      
+
     } catch (error: any) {
+      if (paymentWindow) paymentWindow.close();
       toast.error("Payment Error", {
         description: error.message || "Could not start payment process.",
       });
@@ -204,32 +224,45 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
                 )}
 
                 {booking.status === "COMPLETED" && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-primary text-primary hover:bg-primary hover:text-background shadow-sm"
-                    onClick={() => {
-                      setSelectedBookingForReview(booking.id);
-                      setIsReviewModalOpen(true);
-                    }}
-                  >
-                    Leave Review
-                  </Button>
+                  booking.review ? (
+                    <span className="text-xs font-semibold text-gray-500 bg-gray-500/10 px-2.5 py-1.5 rounded-md border border-gray-500/20">
+                      Reviewed
+                    </span>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-primary text-primary hover:bg-primary hover:text-background shadow-sm"
+                      onClick={() => {
+                        setSelectedBookingForReview(booking.id);
+                        setIsReviewModalOpen(true);
+                      }}
+                    >
+                      Leave Review
+                    </Button>
+                  )
                 )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      
-      {/* Review Modal */}
-      <ReviewModal 
+
+
+      <ReviewModal
         isOpen={isReviewModalOpen}
         onClose={() => {
           setIsReviewModalOpen(false);
           setSelectedBookingForReview("");
         }}
         bookingId={selectedBookingForReview}
+        onSuccess={() => {
+          setBookings(prev => prev.map(b => 
+            b.id === selectedBookingForReview 
+              ? { ...b, review: { id: "new" } } 
+              : b
+          ));
+        }}
       />
     </div>
   );

@@ -2,19 +2,27 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, Wallet, Settings, LogOut, Home, Briefcase } from "lucide-react";
+import { LayoutDashboard, CalendarDays, Wallet, LogOut, Home, Briefcase, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export function TechnicianSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    Cookies.remove("accessToken");
+    router.push("/login");
+    router.refresh();
+  };
 
   const links = [
     { href: "/", label: "Home", icon: Home },
     { href: "/dashboard/technician", label: "Booking Requests", icon: LayoutDashboard },
     { href: "/dashboard/technician/ongoing", label: "Ongoing Bookings", icon: Briefcase },
     { href: "/dashboard/technician/availability", label: "Availability", icon: CalendarDays },
-    { href: "/dashboard/technician/profile", label: "Profile & Services", icon: Wallet },
-    { href: "/dashboard/technician/settings", label: "Settings", icon: Settings },
+    { href: "/dashboard/technician/profile", label: "Profile & Services", icon: User },
   ];
 
   return (
@@ -46,7 +54,11 @@ export function TechnicianSidebar() {
       </nav>
 
       <div className="pt-4 border-t border-secondary/20 mt-4">
-        <Button variant="ghost" className="w-full justify-start text-accent hover:text-accent hover:bg-accent/10 px-4">
+        <Button 
+          variant="ghost" 
+          onClick={handleLogout}
+          className="w-full justify-start text-accent hover:text-accent hover:bg-accent/10 px-4"
+        >
           <LogOut className="h-5 w-5 mr-3" />
           Log Out
         </Button>

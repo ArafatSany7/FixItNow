@@ -8,7 +8,7 @@ import crypto from 'crypto';
 
 const createPayment = async (userEmail: string, payload: any) => {
   const customer = await prisma.user.findUnique({ where: { email: userEmail } });
-  
+
   if (!customer || customer.role !== 'CUSTOMER') {
     throw new ApiError(httpStatus.FORBIDDEN, 'Only customers can initiate payment');
   }
@@ -28,7 +28,6 @@ const createPayment = async (userEmail: string, payload: any) => {
     throw new ApiError(httpStatus.FORBIDDEN, 'You are not authorized to pay for this booking');
   }
 
-  // Assigment Requirement: Only create payment for ACCEPTED bookings
   if (booking.status !== 'ACCEPTED') {
     throw new ApiError(httpStatus.BAD_REQUEST, 'You can only pay for a booking after the technician has ACCEPTED it.');
   }
@@ -91,7 +90,7 @@ const createPayment = async (userEmail: string, payload: any) => {
   };
 
   const sslcz = new SSLCommerzPayment(config.ssl.store_id || 'test', config.ssl.store_pass || 'test', config.ssl.is_live);
-  
+
   return new Promise((resolve, reject) => {
     sslcz.init(data).then((apiResponse: any) => {
       let GatewayPageURL = apiResponse.GatewayPageURL;
@@ -130,14 +129,25 @@ const confirmPayment = async (tranId: string, action: string) => {
       data: { status: status as any }
     });
   }
-  
+
   return `
     <html>
       <head><title>Payment Status</title></head>
-      <body>
+      <body style="font-family: sans-serif; text-align: center; margin-top: 50px;">
         <h1 style="color: ${color};">${message}</h1>
         <p>Your transaction ID is: ${tranId}</p>
-        <p>You can close this window now.</p>
+        <p>Closing window automatically...</p>
+        <script>
+          if (window.opener) {
+            window.opener.postMessage(JSON.stringify({ 
+              type: "payment_success", 
+              bookingId: "${payment.bookingId}" 
+            }), "*");
+          }
+          setTimeout(() => {
+            window.close();
+          }, 2000);
+        </script>
       </body>
     </html>
   `;
@@ -145,7 +155,7 @@ const confirmPayment = async (tranId: string, action: string) => {
 
 const getPaymentHistory = async (userEmail: string) => {
   const customer = await prisma.user.findUnique({ where: { email: userEmail } });
-  
+
   if (!customer || customer.role !== 'CUSTOMER') {
     throw new ApiError(httpStatus.FORBIDDEN, 'Only customers can view payment history');
   }
@@ -165,7 +175,7 @@ const getPaymentHistory = async (userEmail: string) => {
 
 const getPaymentDetails = async (id: string, userEmail: string) => {
   const customer = await prisma.user.findUnique({ where: { email: userEmail } });
-  
+
   if (!customer || customer.role !== 'CUSTOMER') {
     throw new ApiError(httpStatus.FORBIDDEN, 'Only customers can view payment details');
   }

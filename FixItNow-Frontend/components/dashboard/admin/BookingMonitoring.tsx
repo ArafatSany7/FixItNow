@@ -39,8 +39,9 @@ const getStatusBadge = (status: string, paymentStatus?: string) => {
 };
 
 export function BookingMonitoring({ initialBookings = [], showAll = false, customTitle }: { initialBookings?: Booking[], showAll?: boolean, customTitle?: string }) {
-  // Show up to 10 latest bookings on the dashboard overview, otherwise show all
-  const displayedBookings = showAll ? initialBookings : initialBookings.slice(0, 10);
+  // Filter out COMPLETED bookings for the live monitor view
+  const activeBookings = showAll ? initialBookings : initialBookings.filter(b => b.status !== "COMPLETED");
+  const displayedBookings = showAll ? activeBookings : activeBookings.slice(0, 10);
 
   return (
     <div className="bg-background border border-secondary/20 rounded-2xl shadow-sm overflow-hidden">
@@ -54,9 +55,9 @@ export function BookingMonitoring({ initialBookings = [], showAll = false, custo
           </Button>
         )}
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-secondary/5 text-text/70 border-b border-secondary/20">
+      <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+        <table className="w-full text-left text-sm relative">
+          <thead className="bg-secondary/5 text-text/70 border-b border-secondary/20 sticky top-0 backdrop-blur-sm z-10">
             <tr>
               <th className="p-4 font-semibold">ID</th>
               <th className="p-4 font-semibold">Customer</th>

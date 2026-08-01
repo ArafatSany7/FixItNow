@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Save, Plus, X } from "lucide-react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export function ProfileSetupForm() {
   const [isSaving, setIsSaving] = useState(false);
@@ -17,12 +18,15 @@ export function ProfileSetupForm() {
   const [pricing, setPricing] = useState(50);
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
+  const [profileImg, setProfileImg] = useState("");
   const router = useRouter();
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/categories`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/categories`, {
+          cache: 'no-store'
+        });
         const data = await res.json();
         if (data.data) {
           setCategories(data.data);
@@ -46,6 +50,21 @@ export function ProfileSetupForm() {
 
   const handleRemoveSkill = (skillToRemove: string) => {
     setSkills(skills.filter(s => s !== skillToRemove));
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("Image too large", { description: "Please upload an image smaller than 2MB" });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileImg(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -97,6 +116,19 @@ export function ProfileSetupForm() {
       toast.success("Profile Updated", {
         description: "Your service details have been saved.",
       });
+
+
+      if (profileImg) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/users/profile`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: token || '',
+          },
+          body: JSON.stringify({ profileImg })
+        });
+      }
+
       router.refresh();
 
     } catch (error: any) {
@@ -111,6 +143,32 @@ export function ProfileSetupForm() {
   return (
     <form onSubmit={handleSave} className="bg-background border border-secondary/20 rounded-2xl p-6 shadow-sm space-y-8">
 
+      <div className="space-y-4">
+        <h3 className="text-lg font-bold text-text">Profile Picture</h3>
+        <p className="text-sm text-text/60">Upload a picture (JPG/PNG) or provide a URL.</p>
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          {profileImg && (
+            <div className="relative h-16 w-16 shrink-0 rounded-full bg-secondary/20 border-2 border-primary overflow-hidden">
+              <Image src={profileImg} alt="Preview" fill className="object-cover" />
+            </div>
+          )}
+          <div className="flex-1 space-y-3 w-full">
+            <Input
+              type="file"
+              accept="image/jpeg, image/png"
+              onChange={handleImageUpload}
+              className="bg-transparent border-secondary/30 cursor-pointer"
+            />
+            <Input
+              type="url"
+              value={profileImg.startsWith("data:") ? "" : profileImg}
+              onChange={(e) => setProfileImg(e.target.value)}
+              placeholder="Or paste an image URL here..."
+              className="bg-transparent border-secondary/30"
+            />
+          </div>
+        </div>
+      </div>
 
       <div className="space-y-4">
         <h3 className="text-lg font-bold text-text">Service Category</h3>

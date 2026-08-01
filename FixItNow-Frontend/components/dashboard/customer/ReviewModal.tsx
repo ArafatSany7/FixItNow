@@ -11,9 +11,10 @@ interface ReviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   bookingId: string;
+  onSuccess?: () => void;
 }
 
-export function ReviewModal({ isOpen, onClose, bookingId }: ReviewModalProps) {
+export function ReviewModal({ isOpen, onClose, bookingId, onSuccess }: ReviewModalProps) {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -58,6 +59,9 @@ export function ReviewModal({ isOpen, onClose, bookingId }: ReviewModalProps) {
         description: "Thank you for your feedback!",
       });
 
+      if (onSuccess) {
+        onSuccess();
+      }
 
       setRating(0);
       setComment("");

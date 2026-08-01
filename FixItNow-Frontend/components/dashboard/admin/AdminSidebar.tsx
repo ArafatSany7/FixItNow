@@ -2,18 +2,27 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Activity, Settings, LogOut, Home } from "lucide-react";
+import { LayoutDashboard, Users, Activity, LogOut, Home, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    Cookies.remove("accessToken");
+    router.push("/login");
+    router.refresh();
+  };
 
   const links = [
     { href: "/", label: "Home", icon: Home },
     { href: "/dashboard/admin", label: "Overview", icon: LayoutDashboard },
     { href: "/dashboard/admin/users", label: "User Management", icon: Users },
     { href: "/dashboard/admin/bookings", label: "All Bookings", icon: Activity },
-    { href: "/dashboard/admin/settings", label: "Settings", icon: Settings },
+    { href: "/dashboard/admin/categories", label: "Category Management", icon: List },
   ];
 
   return (
@@ -45,7 +54,11 @@ export function AdminSidebar() {
       </nav>
 
       <div className="pt-4 border-t border-secondary/20 mt-4">
-        <Button variant="ghost" className="w-full justify-start text-accent hover:text-accent hover:bg-accent/10 px-4">
+        <Button 
+          variant="ghost" 
+          onClick={handleLogout}
+          className="w-full justify-start text-accent hover:text-accent hover:bg-accent/10 px-4"
+        >
           <LogOut className="h-5 w-5 mr-3" />
           Log Out
         </Button>
