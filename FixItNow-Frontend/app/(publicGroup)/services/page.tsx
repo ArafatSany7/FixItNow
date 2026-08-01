@@ -35,7 +35,7 @@ async function getTechnicians() {
       category: tech.category?.title || "General",
       technician: {
         name: tech.user?.name || "Technician",
-        avatar: tech.user?.profileImg || "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=200&auto=format&fit=crop",
+        avatar: tech.user?.profileImg || "",
         rating: tech.averageRating || 0, 
         reviews: tech.reviewCount || 0,
       },
@@ -54,11 +54,11 @@ export default async function ServicesPage() {
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-8 md:py-12 flex flex-col md:flex-row gap-8 min-h-[calc(100vh-4rem)]">
-      <aside className="w-full md:w-64 lg:w-80 shrink-0">
+      <aside className="w-full md:w-64 lg:w-80 shrink-0 md:sticky md:top-24 h-fit z-10">
         <ServiceFilterSidebar categories={categories} />
       </aside>
 
-      <main className="flex-1">
+      <main className="flex-1 max-h-[calc(100vh-6rem)] overflow-y-auto pr-2 pb-8 custom-scrollbar">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-text mb-2">Available Services</h1>
           <p className="text-text/70">Find the right professional for your needs.</p>

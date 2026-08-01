@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface Category {
@@ -62,7 +62,7 @@ export function ServiceCategories({ categories }: ServiceCategoriesProps) {
           viewport={{ once: true, margin: "-100px" }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {categories.map((category) => (
+          {categories.slice(0, 8).map((category) => (
             <motion.div key={category.id} variants={itemVariants}>
               <Link href={`/services?category=${category.title.toLowerCase()}`}>
                 <div className="group relative overflow-hidden rounded-xl border border-secondary/30 bg-background/50 p-6 hover:bg-secondary/10 hover:border-primary/50 transition-all duration-300">
@@ -79,6 +79,22 @@ export function ServiceCategories({ categories }: ServiceCategoriesProps) {
               </Link>
             </motion.div>
           ))}
+          
+          <motion.div variants={itemVariants}>
+            <Link href="/services">
+              <div className="group relative overflow-hidden rounded-xl border border-primary/40 bg-primary/5 p-6 hover:bg-primary/10 hover:border-primary transition-all duration-300 h-full flex items-center">
+                <div className="flex items-center gap-4 w-full">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary text-background group-hover:scale-110 transition-transform duration-300">
+                    <ArrowRight className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-primary transition-colors">Explore More</h3>
+                    <p className="text-sm text-text/60">View all available service categories</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
         </motion.div>
       </div>
     </section>

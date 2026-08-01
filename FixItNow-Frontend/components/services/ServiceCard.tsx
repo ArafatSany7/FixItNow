@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, MapPin, BadgeCheck } from "lucide-react";
+import { Star, MapPin, BadgeCheck, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ServiceProps {
@@ -56,8 +56,12 @@ export function ServiceCard({ service }: ServiceProps) {
           <div className="mt-auto pt-4 border-t border-secondary/20">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-secondary/20 flex items-center justify-center text-primary font-bold shadow-sm">
-                  {service.technician.name.charAt(0)}
+                <div className="relative h-10 w-10 rounded-full bg-secondary/20 flex items-center justify-center text-primary font-bold shadow-sm overflow-hidden border border-primary/10">
+                  {service.technician.avatar ? (
+                    <Image src={service.technician.avatar} alt={service.technician.name} fill className="object-cover" />
+                  ) : (
+                    <User className="h-5 w-5 text-primary" />
+                  )}
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-text flex items-center gap-1">

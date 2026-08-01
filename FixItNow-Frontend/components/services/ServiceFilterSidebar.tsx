@@ -86,7 +86,7 @@ export function ServiceFilterSidebar({ categories }: ServiceFilterSidebarProps) 
 
         <div className="space-y-3">
           <h3 className="font-semibold text-text">Categories</h3>
-          <div className="space-y-2">
+          <div className="space-y-2 max-h-[140px] overflow-y-auto pr-2 custom-scrollbar">
             {categories.length === 0 ? (
               <div className="text-sm text-text/50 py-2">No categories available</div>
             ) : (

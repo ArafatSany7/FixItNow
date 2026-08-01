@@ -3,32 +3,20 @@
 import { motion } from "framer-motion";
 import { Star, User } from "lucide-react";
 
-const technicians = [
-  { 
-    name: "Karim", 
-    role: "Master Electrician", 
-    rating: 4.9, 
-    jobs: 142
-  },
-  { 
-    name: "Rahim", 
-    role: "Expert Plumber", 
-    rating: 4.8, 
-    jobs: 98
-  },
-  { 
-    name: "Jodu", 
-    role: "AC Technician", 
-    rating: 5.0, 
-    jobs: 215
-  },
-  { 
-    name: "Kodu", 
-    role: "Interior Painter", 
-    rating: 4.7, 
-    jobs: 64
-  },
-];
+import Image from "next/image";
+
+interface Technician {
+  id: string;
+  name: string;
+  role: string;
+  rating: number;
+  jobs: number;
+  avatar: string;
+}
+
+interface TopTechniciansProps {
+  technicians: Technician[];
+}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -45,7 +33,7 @@ const itemVariants = {
   visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } },
 };
 
-export function TopTechnicians() {
+export function TopTechnicians({ technicians }: TopTechniciansProps) {
   return (
     <section className="w-full py-16 md:py-24 lg:py-32 bg-background/50 border-t border-secondary/20">
       <div className="container px-4 md:px-6 mx-auto">
@@ -80,8 +68,12 @@ export function TopTechnicians() {
           {technicians.map((tech, index) => (
             <motion.div key={index} variants={itemVariants}>
               <div className="flex flex-col items-center p-6 rounded-2xl border border-secondary/30 bg-background hover:border-primary/50 hover:shadow-[0_0_15px_rgba(151,192,211,0.1)] transition-all duration-300">
-                <div className="flex items-center justify-center w-24 h-24 rounded-full mb-4 border-2 border-primary/20 bg-secondary/10">
-                  <User className="w-12 h-12 text-primary" />
+                <div className="relative flex items-center justify-center w-24 h-24 rounded-full mb-4 border-2 border-primary/20 bg-secondary/10 overflow-hidden">
+                  {tech.avatar ? (
+                    <Image src={tech.avatar} alt={tech.name} fill className="object-cover" />
+                  ) : (
+                    <User className="w-12 h-12 text-primary" />
+                  )}
                 </div>
                 <h3 className="text-xl font-bold text-text mb-1">{tech.name}</h3>
                 <p className="text-sm text-text/60 mb-3">{tech.role}</p>
