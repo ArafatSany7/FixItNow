@@ -4,25 +4,55 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
-const dummyUsers = [
-  { id: "U-101", name: "arafat", email: "arafat@example.com", role: "CUSTOMER", status: "ACTIVE" },
-  { id: "U-102", name: "Karim", email: "karim@example.com", role: "TECHNICIAN", status: "ACTIVE" },
-  { id: "U-103", name: "SpamUser", email: "spam@example.com", role: "CUSTOMER", status: "BANNED" },
-  { id: "U-104", name: "Modu", email: "modu@example.com", role: "TECHNICIAN", status: "ACTIVE" },
-];
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  isBanned: boolean;
+}
 
-export function UserManagement() {
-  const [users, setUsers] = useState(dummyUsers);
+export function UserManagement({ initialUsers = [] }: { initialUsers?: User[] }) {
+  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
+  const router = useRouter();
 
-  const toggleUserStatus = (id: string, currentStatus: string) => {
-    const newStatus = currentStatus === "ACTIVE" ? "BANNED" : "ACTIVE";
-    
-    setUsers(users.map(u => u.id === id ? { ...u, status: newStatus } : u));
-    
-    toast.success(`User ${newStatus === "BANNED" ? "Banned" : "Unbanned"}`, {
-      description: `User ${id} has been ${newStatus.toLowerCase()}.`,
-    });
+  const toggleUserStatus = async (id: string, currentlyBanned: boolean) => {
+    try {
+      setIsProcessing(id);
+      const token = Cookies.get("accessToken");
+      
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://fixitnow-theta.vercel.app/api"}/users/${id}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token || "",
+        },
+        body: JSON.stringify({ isBanned: !currentlyBanned })
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to update user status");
+      }
+
+      setUsers(users.map(u => u.id === id ? { ...u, isBanned: !currentlyBanned } : u));
+      
+      toast.success(`User ${!currentlyBanned ? "Banned" : "Unbanned"}`, {
+        description: `User ${id} has been ${!currentlyBanned ? "banned" : "unbanned"}.`,
+      });
+      
+      router.refresh();
+    } catch (error: any) {
+      toast.error("Error", {
+        description: error.message || "An unexpected error occurred.",
+      });
+    } finally {
+      setIsProcessing(null);
+    }
   };
 
   return (
@@ -43,48 +73,54 @@ export function UserManagement() {
             </tr>
           </thead>
           <tbody className="divide-y divide-secondary/10">
-            {users.map((user) => (
-              <tr key={user.id} className="hover:bg-secondary/5 transition-colors">
-                <td className="p-4 font-medium text-text">{user.id}</td>
-                <td className="p-4 text-text/80">{user.name}</td>
-                <td className="p-4 text-text/80">{user.email}</td>
-                <td className="p-4">
-                  <span className={`px-2 py-1 rounded-md text-xs font-semibold ${
-                    user.role === 'TECHNICIAN' ? 'bg-primary/10 text-primary' : 'bg-secondary/20 text-text/80'
-                  }`}>
-                    {user.role}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <span className={`px-2 py-1 rounded-md text-xs font-semibold ${
-                    user.status === 'ACTIVE' ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'
-                  }`}>
-                    {user.status}
-                  </span>
-                </td>
-                <td className="p-4 text-right">
-                  {user.status === "ACTIVE" ? (
-                    <Button 
-                      onClick={() => toggleUserStatus(user.id, user.status)}
-                      variant="outline" 
-                      size="sm" 
-                      className="border-red-500/50 text-red-600 hover:bg-red-500/10 h-8"
-                    >
-                      <ShieldAlert className="h-4 w-4 mr-1" /> Ban User
-                    </Button>
-                  ) : (
-                    <Button 
-                      onClick={() => toggleUserStatus(user.id, user.status)}
-                      variant="outline" 
-                      size="sm" 
-                      className="border-green-500/50 text-green-600 hover:bg-green-500/10 h-8"
-                    >
-                      <ShieldCheck className="h-4 w-4 mr-1" /> Unban
-                    </Button>
-                  )}
-                </td>
+            {users.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="p-8 text-center text-text/60">No users found.</td>
               </tr>
-            ))}
+            ) : (
+              users.map((user) => (
+                <tr key={user.id} className="hover:bg-secondary/5 transition-colors">
+                  <td className="p-4 font-medium text-text">{user.id.split("-")[0]}</td>
+                  <td className="p-4 text-text/80">{user.name}</td>
+                  <td className="p-4 text-text/80">{user.email}</td>
+                  <td className="p-4">
+                    <span className={`px-2 py-1 rounded-md text-xs font-semibold ${
+                      user.role === "TECHNICIAN" ? "bg-primary/10 text-primary" : (user.role === "ADMIN" ? "bg-purple-500/10 text-purple-600" : "bg-secondary/20 text-text/80")
+                    }`}>
+                      {user.role}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    <span className={`px-2 py-1 rounded-md text-xs font-semibold ${
+                      !user.isBanned ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
+                    }`}>
+                      {!user.isBanned ? "ACTIVE" : "BANNED"}
+                    </span>
+                  </td>
+                  <td className="p-4 text-right">
+                    {user.role !== "ADMIN" && (
+                      <Button
+                        variant={!user.isBanned ? "outline" : "default"}
+                        size="sm"
+                        onClick={() => toggleUserStatus(user.id, user.isBanned)}
+                        disabled={isProcessing === user.id}
+                        className={`h-8 ${
+                          !user.isBanned 
+                            ? "border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950" 
+                            : "bg-green-600 text-white hover:bg-green-700"
+                        }`}
+                      >
+                        {!user.isBanned ? (
+                          <><ShieldAlert className="h-4 w-4 mr-1.5" /> {isProcessing === user.id ? "Banning..." : "Ban User"}</>
+                        ) : (
+                          <><ShieldCheck className="h-4 w-4 mr-1.5" /> {isProcessing === user.id ? "Unbanning..." : "Unban User"}</>
+                        )}
+                      </Button>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

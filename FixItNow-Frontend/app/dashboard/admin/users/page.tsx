@@ -1,11 +1,31 @@
 import { UserManagement } from "@/components/dashboard/admin/UserManagement";
+import { cookies } from "next/headers";
 
 export const metadata = {
   title: "User Management | FixItNow",
   description: "Manage platform users and technicians",
 };
 
-export default function AdminUsersPage() {
+async function getAllUsers() {
+  const token = cookies().get("accessToken")?.value;
+  if (!token) return [];
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://fixitnow-theta.vercel.app/api"}/users`, {
+      headers: { Authorization: token },
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data?.data || [];
+  } catch (error) {
+    return [];
+  }
+}
+
+export default async function AdminUsersPage() {
+  const users = await getAllUsers();
+
   return (
     <div className="space-y-6">
       <div>
@@ -14,7 +34,7 @@ export default function AdminUsersPage() {
       </div>
 
       <div className="pt-2">
-        <UserManagement />
+        <UserManagement initialUsers={users} />
       </div>
     </div>
   );

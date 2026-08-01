@@ -39,4 +39,10 @@ router.patch(
   BookingController.cancelBooking
 );
 
+router.get(
+  '/',
+  auth(Role.ADMIN),
+  BookingController.getAllBookings
+);
+
 export const BookingRoutes = router;
