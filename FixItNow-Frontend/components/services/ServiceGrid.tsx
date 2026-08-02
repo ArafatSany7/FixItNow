@@ -20,11 +20,18 @@ const containerVariants = {
 
 export function ServiceGrid({ initialServices }: ServiceGridProps) {
   const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("search");
   const searchCategory = searchParams.get("category");
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   
   const filteredServices = initialServices.filter(s => {
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesTitle = s.title?.toLowerCase().includes(query);
+      const matchesCategory = s.category?.toLowerCase().includes(query);
+      if (!matchesTitle && !matchesCategory) return false;
+    }
     if (searchCategory && s.category.toLowerCase() !== searchCategory.toLowerCase()) return false;
     if (minPrice && s.price < Number(minPrice)) return false;
     if (maxPrice && s.price > Number(maxPrice)) return false;

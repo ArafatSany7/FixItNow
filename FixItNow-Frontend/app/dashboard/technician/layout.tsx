@@ -1,4 +1,5 @@
 import { TechnicianSidebar } from "@/components/dashboard/technician/TechnicianSidebar";
+import { ProfileGuard } from "@/components/dashboard/technician/ProfileGuard";
 
 export const metadata = {
   title: "Technician Dashboard | FixItNow",
@@ -17,7 +18,9 @@ export default function TechnicianDashboardLayout({
       </aside>
 
       <main className="flex-1 min-w-0 bg-background border border-secondary/20 rounded-2xl p-6 shadow-sm overflow-hidden">
-        {children}
+        <ProfileGuard>
+          {children}
+        </ProfileGuard>
       </main>
     </div>
   );

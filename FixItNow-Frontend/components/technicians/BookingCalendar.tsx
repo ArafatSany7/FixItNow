@@ -10,9 +10,10 @@ import { useRouter } from "next/navigation";
 interface BookingCalendarProps {
   technicianId: string;
   availability?: Record<string, string[]>;
+  technicianBookings?: { date: string, timeSlot: string, status: string }[];
 }
 
-export function BookingCalendar({ technicianId, availability = {} }: BookingCalendarProps) {
+export function BookingCalendar({ technicianId, availability = {}, technicianBookings = [] }: BookingCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<number>(0);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isBooking, setIsBooking] = useState(false);
@@ -128,19 +129,32 @@ export function BookingCalendar({ technicianId, availability = {} }: BookingCale
         </div>
         <div className="grid grid-cols-2 gap-3">
           {availableSlots.length > 0 ? (
-            availableSlots.map((time) => (
-              <Button
-                key={time}
-                variant="outline"
-                className={`border-secondary/30 ${selectedTime === time
-                    ? "bg-primary text-background border-primary"
-                    : "hover:border-primary/50 text-text/80"
+            availableSlots.map((time) => {
+              // Check if this time slot on this specific date is already booked
+              const isBooked = technicianBookings.some(b => {
+                const bookingDate = new Date(b.date).toDateString();
+                const currentDate = new Date(next7Days[selectedDate].isoDate).toDateString();
+                return bookingDate === currentDate && b.timeSlot === time;
+              });
+
+              return (
+                <Button
+                  key={time}
+                  variant="outline"
+                  disabled={isBooked}
+                  className={`border-secondary/30 ${
+                    isBooked
+                      ? "bg-secondary/10 text-text/30 cursor-not-allowed line-through hover:bg-secondary/10 hover:text-text/30"
+                      : selectedTime === time
+                      ? "bg-primary text-background border-primary hover:bg-primary/90 hover:text-background"
+                      : "hover:border-primary/50 text-text/80"
                   }`}
-                onClick={() => setSelectedTime(time)}
-              >
-                {time}
-              </Button>
-            ))
+                  onClick={() => !isBooked && setSelectedTime(time)}
+                >
+                  {time}
+                </Button>
+              );
+            })
           ) : (
             <div className="col-span-2 text-center text-text/50 py-4 text-sm">
               Not available on this date

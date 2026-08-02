@@ -175,6 +175,18 @@ const getSingleTechnician = async (id: string) => {
           contactNo: true,
           address: true,
           profileImg: true,
+          technicianBookings: {
+            where: {
+              status: {
+                notIn: ['CANCELLED', 'DECLINED']
+              }
+            },
+            select: {
+              date: true,
+              timeSlot: true,
+              status: true
+            }
+          }
         },
       },
     },

@@ -196,7 +196,7 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
                 {getStatusBadge(booking.status, booking.payment?.status)}
               </td>
               <td className="p-4 text-right">
-                {(booking.status === "PENDING" || booking.status === "REQUESTED") && (
+                {(booking.status === "PENDING" || booking.status === "REQUESTED" || booking.status === "ACCEPTED") && (
                   <Button
                     variant="outline"
                     size="sm"

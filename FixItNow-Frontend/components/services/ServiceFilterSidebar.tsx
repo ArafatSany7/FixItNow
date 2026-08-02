@@ -21,6 +21,7 @@ export function ServiceFilterSidebar({ categories }: ServiceFilterSidebarProps) 
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
@@ -28,6 +29,9 @@ export function ServiceFilterSidebar({ categories }: ServiceFilterSidebarProps) 
   const handleApplyFilters = () => {
     const params = new URLSearchParams(searchParams.toString());
     
+    if (searchQuery) params.set("search", searchQuery);
+    else params.delete("search");
+
     if (selectedCategory) params.set("category", selectedCategory.toLowerCase());
     else params.delete("category");
 
@@ -41,6 +45,7 @@ export function ServiceFilterSidebar({ categories }: ServiceFilterSidebarProps) 
   };
 
   const handleResetFilters = () => {
+    setSearchQuery("");
     setSelectedCategory("");
     setMinPrice("");
     setMaxPrice("");
@@ -76,6 +81,8 @@ export function ServiceFilterSidebar({ categories }: ServiceFilterSidebarProps) 
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text/50" />
             <Input 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="e.g. Plumbing, AC Repair" 
               className="pl-9 bg-transparent border-secondary h-11 focus-visible:ring-primary"
             />

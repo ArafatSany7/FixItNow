@@ -39,7 +39,7 @@ const getStatusBadge = (status: string, paymentStatus?: string) => {
 };
 
 export function BookingMonitoring({ initialBookings = [], showAll = false, customTitle }: { initialBookings?: Booking[], showAll?: boolean, customTitle?: string }) {
-  // Filter out COMPLETED bookings for the live monitor view
+
   const activeBookings = showAll ? initialBookings : initialBookings.filter(b => b.status !== "COMPLETED");
   const displayedBookings = showAll ? activeBookings : activeBookings.slice(0, 10);
 
@@ -48,7 +48,7 @@ export function BookingMonitoring({ initialBookings = [], showAll = false, custo
       <div className="p-5 border-b border-secondary/20 flex justify-between items-center bg-secondary/5">
         <h3 className="text-lg font-bold text-text">{customTitle ? customTitle : (showAll ? "All Bookings Directory" : "Live Booking Monitor")}</h3>
         {!showAll && (
-          <Button asChild variant="outline" size="sm" className="border-secondary text-text hover:bg-secondary/10">
+          <Button asChild variant="outline" size="sm" className="border-secondary text-text bg-transparent hover:bg-secondary/10">
             <Link href="/dashboard/admin/bookings">
               View All
             </Link>
@@ -78,7 +78,7 @@ export function BookingMonitoring({ initialBookings = [], showAll = false, custo
                   <td className="p-4 font-medium text-text">{booking.id.slice(0, 8)}</td>
                   <td className="p-4 text-text/80">{booking.customer?.name || "N/A"}</td>
                   <td className="p-4 text-text/80">{booking.technician?.name || "N/A"}</td>
-                  {/* Fallback to checking technician category title if service title isn't directly attached */}
+
                   <td className="p-4 text-text/80">{booking.service?.title || (booking.technician as any)?.technicianProfile?.category?.title || "N/A"}</td>
                   <td className="p-4">
                     {getStatusBadge(booking.status, (booking as any).payment?.status)}

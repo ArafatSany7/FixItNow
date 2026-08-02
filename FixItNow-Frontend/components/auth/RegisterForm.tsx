@@ -12,15 +12,21 @@ import { Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
+import { setToken } from "@/lib/cookie";
+import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
+
+interface JwtPayload {
+  role: string;
+  userId: string;
+}
 
 const formSchema = z.object({
   role: z.enum(["customer", "technician"], { required_error: "Please select your role." }),
   firstName: z.string().min(2, { message: "First name must be at least 2 characters." }),
   lastName: z.string().min(2, { message: "Last name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-  terms: z.boolean().refine(val => val === true, { message: "You must agree to the terms and conditions." })
+  password: z.string().min(6, { message: "Password must be at least 6 characters." })
 });
 
 export function RegisterForm() {
@@ -37,7 +43,6 @@ export function RegisterForm() {
       lastName: "",
       email: "",
       password: "",
-      terms: false,
     },
   });
 
@@ -50,10 +55,30 @@ export function RegisterForm() {
         password: values.password,
         role: values.role.toUpperCase(),
       };
-      
+
       await api.post('/auth/register', payload);
-      toast.success("Account created successfully! Please log in.");
-      router.push('/login');
+
+
+      const loginRes = await api.post('/auth/login', { email: values.email, password: values.password });
+      const token = loginRes.data?.data?.token || loginRes.data?.token || loginRes.data?.data?.accessToken;
+
+      if (token) {
+        setToken(token);
+        const decoded = jwtDecode<JwtPayload>(token);
+
+        if (decoded.role === "TECHNICIAN") {
+          toast.success("Account created! Please set up your profile.");
+          router.push('/dashboard/technician/profile');
+        } else if (decoded.role === "ADMIN" || decoded.role === "SUPER_ADMIN") {
+          router.push('/dashboard/admin');
+        } else {
+          toast.success("Account created successfully!");
+          router.push('/dashboard/customer');
+        }
+      } else {
+        toast.success("Account created successfully! Please log in.");
+        router.push('/login');
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to create account.");
     } finally {
@@ -71,7 +96,7 @@ export function RegisterForm() {
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-text mb-2">Create an account</h1>
         <p className="text-text/60">
-          Already have an account? 
+          Already have an account?
           <Link href="/login" className="ml-1 text-primary hover:underline font-medium transition-colors">
             Log in
           </Link>
@@ -88,19 +113,19 @@ export function RegisterForm() {
                 <FormLabel className="text-text font-semibold">I want to...</FormLabel>
                 <FormControl>
                   <div className="grid grid-cols-2 gap-4">
-                    <div 
+                    <div
                       onClick={() => field.onChange("customer")}
-                      className={`cursor-pointer rounded-xl border p-4 text-center transition-all ${field.value === "customer" ? "border-primary bg-primary/10 shadow-sm" : "border-secondary/30 bg-transparent hover:border-primary/50"}`}
+                      className={`cursor-pointer rounded-xl border p-4 text-center transition-all ${field.value === "customer" ? "border-primary bg-primary shadow-sm" : "border-secondary/30 bg-transparent hover:border-primary/50"}`}
                     >
-                      <h3 className={`font-bold ${field.value === "customer" ? "text-primary" : "text-text"}`}>Book Services</h3>
-                      <p className="text-xs text-text/60 mt-1">I need a professional</p>
+                      <h3 className={`font-bold ${field.value === "customer" ? "text-background" : "text-text"}`}>Book Services</h3>
+                      <p className={`text-xs mt-1 ${field.value === "customer" ? "text-background/90" : "text-text/60"}`}>I need a professional</p>
                     </div>
-                    <div 
+                    <div
                       onClick={() => field.onChange("technician")}
-                      className={`cursor-pointer rounded-xl border p-4 text-center transition-all ${field.value === "technician" ? "border-primary bg-primary/10 shadow-sm" : "border-secondary/30 bg-transparent hover:border-primary/50"}`}
+                      className={`cursor-pointer rounded-xl border p-4 text-center transition-all ${field.value === "technician" ? "border-primary bg-primary shadow-sm" : "border-secondary/30 bg-transparent hover:border-primary/50"}`}
                     >
-                      <h3 className={`font-bold ${field.value === "technician" ? "text-primary" : "text-text"}`}>Offer Services</h3>
-                      <p className="text-xs text-text/60 mt-1">I am a professional</p>
+                      <h3 className={`font-bold ${field.value === "technician" ? "text-background" : "text-text"}`}>Offer Services</h3>
+                      <p className={`text-xs mt-1 ${field.value === "technician" ? "text-background/90" : "text-text/60"}`}>I am a professional</p>
                     </div>
                   </div>
                 </FormControl>
@@ -160,11 +185,11 @@ export function RegisterForm() {
                 <FormLabel className="text-text sr-only">Password</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Input 
-                      type={showPassword ? "text" : "password"} 
-                      placeholder="Enter your password" 
-                      {...field} 
-                      className="bg-transparent border-secondary text-text placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-primary h-12 pr-10" 
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      {...field}
+                      className="bg-transparent border-secondary text-text placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-primary h-12 pr-10"
                     />
                     <button
                       type="button"
@@ -180,34 +205,12 @@ export function RegisterForm() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="terms"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-2">
-                <FormControl>
-                  <input
-                    type="checkbox"
-                    checked={field.value}
-                    onChange={field.onChange}
-                    className="h-4 w-4 rounded border-secondary/30 bg-secondary/10 text-primary focus:ring-primary mt-1"
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel className="text-sm font-medium text-text/80 cursor-pointer">
-                    I agree to the <Link href="/terms" className="text-primary hover:underline">Terms & Conditions</Link>
-                  </FormLabel>
-                </div>
-              </FormItem>
-            )}
-          />
-
           <Button type="submit" disabled={isLoading} className="w-full h-12 bg-primary hover:bg-primary/90 text-background text-base font-bold shadow-lg shadow-primary/20">
             {isLoading ? "Creating account..." : "Create Account"}
           </Button>
         </form>
       </Form>
-      
+
       <div className="mt-8 flex items-center justify-center space-x-4">
         <div className="flex-1 border-t border-secondary/30" />
         <span className="text-sm text-text/50">Or register with</span>
@@ -215,7 +218,7 @@ export function RegisterForm() {
       </div>
 
       <div className="mt-6 flex justify-center">
-        <Button variant="outline" className="w-full h-12 border-secondary bg-transparent hover:bg-secondary/10">
+        <Button onClick={() => toast.info("Register with Google will be added soon")} variant="outline" type="button" className="w-full h-12 border-secondary bg-transparent hover:bg-secondary/10">
           <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

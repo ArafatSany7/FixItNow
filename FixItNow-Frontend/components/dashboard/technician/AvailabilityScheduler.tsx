@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Check, Clock } from "lucide-react";
 import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export function AvailabilityScheduler() {
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -13,6 +14,7 @@ export function AvailabilityScheduler() {
   const [availability, setAvailability] = useState<Record<string, string[]>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -67,6 +69,7 @@ export function AvailabilityScheduler() {
       toast.success("Availability Updated", {
         description: "Your weekly schedule has been saved successfully.",
       });
+      router.push('/dashboard/technician');
     } catch (error) {
       toast.error("Error", { description: "Failed to update availability" });
     } finally {

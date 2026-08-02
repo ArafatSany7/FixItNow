@@ -3,6 +3,23 @@
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+
+const getCategoryIcon = (title: string) => {
+  const t = title.toLowerCase();
+  let src = "/icons/Cleaning-removebg-preview.png";
+
+  if (t.includes('clean')) src = "/icons/Cleaning-removebg-preview.png";
+  else if (t.includes('electric')) src = "/icons/Electrical-removebg-preview.png";
+  else if (t.includes('plumb')) src = "/icons/Plumbing-removebg-preview.png";
+  else if (t.includes('interior') || t.includes('design')) src = "/icons/Interior-removebg-preview.png";
+  else if (t.includes('network') || t.includes('internet')) src = "/icons/Network_provider-removebg-preview.png";
+  else if (t.includes('waste') || t.includes('garbage')) src = "/icons/Waste_Loader-removebg-preview.png";
+  else if (t.includes('watch') || t.includes('security') || t.includes('guard')) src = "/icons/Watchmen-removebg-preview.png";
+  else if (t.includes('water')) src = "/icons/Water_duistributor-removebg-preview.png";
+
+  return <Image src={src} alt={title} width={56} height={56} className="object-contain drop-shadow-sm" />;
+};
 
 interface Category {
   id: string;
@@ -67,8 +84,8 @@ export function ServiceCategories({ categories }: ServiceCategoriesProps) {
               <Link href={`/services?category=${category.title.toLowerCase()}`}>
                 <div className="group relative overflow-hidden rounded-xl border border-secondary/30 bg-background/50 p-6 hover:bg-secondary/10 hover:border-primary/50 transition-all duration-300">
                   <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/20 text-primary group-hover:scale-110 transition-transform duration-300">
-                      <Sparkles className="h-6 w-6" />
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-secondary/5 text-primary group-hover:scale-110 group-hover:bg-primary/5 transition-transform duration-300">
+                      {getCategoryIcon(category.title)}
                     </div>
                     <div>
                       <h3 className="font-bold text-lg text-text group-hover:text-primary transition-colors">{category.title}</h3>
@@ -79,12 +96,12 @@ export function ServiceCategories({ categories }: ServiceCategoriesProps) {
               </Link>
             </motion.div>
           ))}
-          
+
           <motion.div variants={itemVariants}>
             <Link href="/services">
               <div className="group relative overflow-hidden rounded-xl border border-primary/40 bg-primary/5 p-6 hover:bg-primary/10 hover:border-primary transition-all duration-300 h-full flex items-center">
                 <div className="flex items-center gap-4 w-full">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary text-background group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-primary text-background group-hover:scale-110 transition-transform duration-300">
                     <ArrowRight className="h-6 w-6" />
                   </div>
                   <div>

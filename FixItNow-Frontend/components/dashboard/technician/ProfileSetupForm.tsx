@@ -189,6 +189,7 @@ export function ProfileSetupForm() {
       }
 
       router.refresh();
+      router.push("/dashboard/technician");
 
     } catch (error: any) {
       toast.error("Error", {

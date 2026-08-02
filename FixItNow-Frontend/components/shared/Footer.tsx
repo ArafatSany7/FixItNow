@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { toast } from "sonner";
 import { Wrench, Mail, Phone, MapPin } from "lucide-react";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 import { FAQModal } from "./FAQModal";
@@ -18,9 +21,9 @@ export function Footer() {
               Your trusted platform for booking qualified home service professionals. Reliable, fast, and secure.
             </p>
             <div className="flex items-center gap-4 pt-2">
-              <Link href="#" className="hover:text-primary transition-colors"><FaFacebook className="h-5 w-5" /></Link>
-              <Link href="#" className="hover:text-primary transition-colors"><FaTwitter className="h-5 w-5" /></Link>
-              <Link href="#" className="hover:text-primary transition-colors"><FaInstagram className="h-5 w-5" /></Link>
+              <Link href="#" onClick={(e) => { e.preventDefault(); toast.info("Facebook will be added soon"); }} className="hover:text-primary transition-colors"><FaFacebook className="h-5 w-5" /></Link>
+              <Link href="#" onClick={(e) => { e.preventDefault(); toast.info("X will be added soon"); }} className="hover:text-primary transition-colors"><FaTwitter className="h-5 w-5" /></Link>
+              <Link href="#" onClick={(e) => { e.preventDefault(); toast.info("Instagram will be added soon"); }} className="hover:text-primary transition-colors"><FaInstagram className="h-5 w-5" /></Link>
             </div>
           </div>
 

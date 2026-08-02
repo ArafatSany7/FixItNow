@@ -129,7 +129,11 @@ export function TechnicianProfile({ technician, reviews }: TechnicianProfileProp
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
       >
-        <BookingCalendar technicianId={technician.userId} availability={technician.availability} />
+        <BookingCalendar 
+          technicianId={technician.userId} 
+          availability={technician.availability} 
+          technicianBookings={technician.user?.technicianBookings || []}
+        />
       </motion.div>
 
     </div>
