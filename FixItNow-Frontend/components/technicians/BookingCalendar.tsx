@@ -4,6 +4,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, Clock } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
@@ -17,6 +24,7 @@ export function BookingCalendar({ technicianId, availability = {}, technicianBoo
   const [selectedDate, setSelectedDate] = useState<number>(0);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isBooking, setIsBooking] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const router = useRouter();
 
 
@@ -35,7 +43,7 @@ export function BookingCalendar({ technicianId, availability = {}, technicianBoo
   });
 
   const selectedDayName = next7Days[selectedDate].fullDayName;
-  const availableSlots = availability && availability[selectedDayName] && availability[selectedDayName].length > 0 
+  const availableSlots = availability && availability[selectedDayName] && availability[selectedDayName].length > 0
     ? availability[selectedDayName]
     : [];
 
@@ -46,7 +54,7 @@ export function BookingCalendar({ technicianId, availability = {}, technicianBoo
     const token = Cookies.get("accessToken");
 
     if (!token) {
-      toast.error("Authentication required", { description: "Please log in to book a service." });
+      setIsAuthModalOpen(true);
       setIsBooking(false);
       return;
     }
@@ -130,7 +138,7 @@ export function BookingCalendar({ technicianId, availability = {}, technicianBoo
         <div className="grid grid-cols-2 gap-3">
           {availableSlots.length > 0 ? (
             availableSlots.map((time) => {
-              // Check if this time slot on this specific date is already booked
+
               const isBooked = technicianBookings.some(b => {
                 const bookingDate = new Date(b.date).toDateString();
                 const currentDate = new Date(next7Days[selectedDate].isoDate).toDateString();
@@ -142,13 +150,12 @@ export function BookingCalendar({ technicianId, availability = {}, technicianBoo
                   key={time}
                   variant="outline"
                   disabled={isBooked}
-                  className={`border-secondary/30 ${
-                    isBooked
+                  className={`border-secondary/30 ${isBooked
                       ? "bg-secondary/10 text-text/30 cursor-not-allowed line-through hover:bg-secondary/10 hover:text-text/30"
                       : selectedTime === time
-                      ? "bg-primary text-background border-primary hover:bg-primary/90 hover:text-background"
-                      : "hover:border-primary/50 text-text/80"
-                  }`}
+                        ? "bg-primary text-background border-primary hover:bg-primary/90 hover:text-background"
+                        : "hover:border-primary/50 text-text/80"
+                    }`}
                   onClick={() => !isBooked && setSelectedTime(time)}
                 >
                   {time}
@@ -164,15 +171,41 @@ export function BookingCalendar({ technicianId, availability = {}, technicianBoo
       </div>
 
       <Button
-        onClick={handleBooking}
+        className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm shadow-primary/20"
         disabled={!selectedTime || isBooking}
-        className="w-full bg-primary text-background hover:bg-primary/90 h-12 text-base font-semibold"
+        onClick={handleBooking}
       >
         {isBooking ? "Booking..." : "Request Booking"}
       </Button>
-      <p className="text-xs text-center text-text/50 mt-3">
+      <p className="text-center text-xs text-text/50 mt-3 font-medium">
         You won't be charged until the technician accepts.
       </p>
+
+      <Dialog open={isAuthModalOpen} onOpenChange={setIsAuthModalOpen}>
+        <DialogContent className="sm:max-w-md border-secondary/20 bg-background">
+          <DialogHeader className="mb-2">
+            <DialogTitle className="text-2xl text-center text-primary font-bold">Authentication Required</DialogTitle>
+            <DialogDescription className="text-center text-text/70 pt-2 text-base">
+              Only registered customers can book a service. Please log in or create a new customer account to continue with your booking.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 mt-4">
+            <Button
+              className="w-full bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20 py-5 text-md font-semibold"
+              onClick={() => router.push('/login')}
+            >
+              Login to Account
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full border-primary/30 text-primary hover:bg-primary/5 py-5 text-md font-semibold"
+              onClick={() => router.push('/register')}
+            >
+              Create New Account
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
