@@ -24,6 +24,8 @@ export function ServiceGrid({ initialServices }: ServiceGridProps) {
   const searchCategory = searchParams.get("category");
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
+  const location = searchParams.get("location");
+  const minRating = searchParams.get("minRating");
   
   const filteredServices = initialServices.filter(s => {
     if (searchQuery) {
@@ -35,6 +37,8 @@ export function ServiceGrid({ initialServices }: ServiceGridProps) {
     if (searchCategory && s.category.toLowerCase() !== searchCategory.toLowerCase()) return false;
     if (minPrice && s.price < Number(minPrice)) return false;
     if (maxPrice && s.price > Number(maxPrice)) return false;
+    if (location && !s.location.toLowerCase().includes(location.toLowerCase())) return false;
+    if (minRating && s.technician.rating < Number(minRating)) return false;
     return true;
   });
 

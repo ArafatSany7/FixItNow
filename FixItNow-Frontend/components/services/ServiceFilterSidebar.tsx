@@ -25,6 +25,8 @@ export function ServiceFilterSidebar({ categories }: ServiceFilterSidebarProps) 
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
+  const [location, setLocation] = useState(searchParams.get("location") || "");
+  const [minRating, setMinRating] = useState(searchParams.get("minRating") || "");
 
   const handleApplyFilters = () => {
     const params = new URLSearchParams(searchParams.toString());
@@ -41,6 +43,12 @@ export function ServiceFilterSidebar({ categories }: ServiceFilterSidebarProps) 
     if (maxPrice) params.set("maxPrice", maxPrice);
     else params.delete("maxPrice");
 
+    if (location) params.set("location", location);
+    else params.delete("location");
+
+    if (minRating) params.set("minRating", minRating);
+    else params.delete("minRating");
+
     window.history.pushState(null, '', `?${params.toString()}`);
   };
 
@@ -49,6 +57,8 @@ export function ServiceFilterSidebar({ categories }: ServiceFilterSidebarProps) 
     setSelectedCategory("");
     setMinPrice("");
     setMaxPrice("");
+    setLocation("");
+    setMinRating("");
     window.history.pushState(null, '', `/services`);
   };
 
@@ -136,6 +146,41 @@ export function ServiceFilterSidebar({ categories }: ServiceFilterSidebarProps) 
               onChange={(e) => setMaxPrice(e.target.value)}
               className="bg-transparent border-secondary h-10 text-sm" 
             />
+          </div>
+        </div>
+
+        <div className="h-px bg-secondary/20 w-full" />
+
+        <div className="space-y-3">
+          <h3 className="font-semibold text-text">Location</h3>
+          <Input 
+            type="text" 
+            placeholder="City or Address" 
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            className="bg-transparent border-secondary h-10 text-sm focus-visible:ring-primary" 
+          />
+        </div>
+
+        <div className="h-px bg-secondary/20 w-full" />
+
+        <div className="space-y-3">
+          <h3 className="font-semibold text-text">Rating</h3>
+          <div className="space-y-2">
+            {[4, 3, 2, 1].map((rating) => (
+              <label key={rating} className="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="radio" 
+                  name="minRating"
+                  checked={minRating === rating.toString()}
+                  onChange={() => setMinRating(rating.toString())}
+                  className="rounded-full border-secondary/30 text-primary focus:ring-primary bg-secondary/10" 
+                />
+                <span className={`text-sm transition-colors ${minRating === rating.toString() ? "text-primary font-medium" : "text-text/80 hover:text-primary"}`}>
+                  {rating}+ Stars
+                </span>
+              </label>
+            ))}
           </div>
         </div>
 

@@ -19,6 +19,7 @@ export function ProfileSetupForm() {
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
   const [profileImg, setProfileImg] = useState("");
+  const [location, setLocation] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const router = useRouter();
 
@@ -48,6 +49,7 @@ export function ProfileSetupForm() {
           if (profileData.data) {
             const user = profileData.data;
             if (user.profileImg) setProfileImg(user.profileImg);
+            if (user.address) setLocation(user.address);
 
             if (user.technicianProfile) {
               const tech = user.technicianProfile;
@@ -110,7 +112,8 @@ export function ProfileSetupForm() {
       categoryId,
       skills,
       experience: Number(experience),
-      pricing: Number(pricing)
+      pricing: Number(pricing),
+      ...(location.trim() && { location: location.trim() }),
     };
 
     try {
@@ -134,7 +137,8 @@ export function ProfileSetupForm() {
           body: JSON.stringify({
             skills,
             experience: Number(experience),
-            pricing: Number(pricing)
+            pricing: Number(pricing),
+            ...(location.trim() && { location: location.trim() }),
           })
         });
       }
@@ -283,6 +287,18 @@ export function ProfileSetupForm() {
               required
             />
           </div>
+        </div>
+
+        <div className="mt-4">
+          <label className="block text-sm text-text/70 mb-1">Service Location (Optional)</label>
+          <Input
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="e.g., New York, NY or Downtown Area"
+            className="bg-transparent border-secondary/30"
+          />
+          <p className="text-xs text-text/50 mt-1">Leave empty to show as "Available locally".</p>
         </div>
       </div>
 

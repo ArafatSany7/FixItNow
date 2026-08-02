@@ -3,6 +3,8 @@ import ApiError from '../../errors/ApiError';
 import httpStatus from 'http-status';
 
 const createProfile = async (email: string, payload: any) => {
+  const { location, ...profileData } = payload;
+  
   const user = await prisma.user.findUnique({
     where: { email },
   });
@@ -19,10 +21,17 @@ const createProfile = async (email: string, payload: any) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Technician profile already exists for this user');
   }
 
+  if (location !== undefined) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { address: location }
+    });
+  }
+
   const result = await prisma.technicianProfile.create({
     data: {
       userId: user.id,
-      ...payload,
+      ...profileData,
     },
     include: {
       category: true,
@@ -43,6 +52,8 @@ const createProfile = async (email: string, payload: any) => {
 };
 
 const updateProfile = async (email: string, payload: any) => {
+  const { location, ...profileData } = payload;
+  
   const user = await prisma.user.findUnique({
     where: { email },
     include: { technicianProfile: true },
@@ -52,9 +63,16 @@ const updateProfile = async (email: string, payload: any) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Technician profile not found');
   }
 
+  if (location !== undefined) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { address: location }
+    });
+  }
+
   const result = await prisma.technicianProfile.update({
     where: { id: user.technicianProfile.id },
-    data: payload,
+    data: profileData,
     include: {
       category: true,
       user: {
@@ -74,7 +92,7 @@ const updateProfile = async (email: string, payload: any) => {
 };
 
 const getAllTechnicians = async (query: any) => {
-  const { searchTerm, categoryId, minPrice, maxPrice, page = 1, limit = 10, sortBy, sortOrder } = query;
+  const { searchTerm, categoryId, minPrice, maxPrice, location, minRating, page = 1, limit = 10, sortBy, sortOrder } = query;
 
   const skip = (Number(page) - 1) * Number(limit);
 
@@ -101,6 +119,10 @@ const getAllTechnicians = async (query: any) => {
         ...(maxPrice && { lte: Number(maxPrice) }),
       },
     });
+  }
+
+  if (location) {
+    andConditions.push({ user: { address: { contains: location, mode: 'insensitive' } } });
   }
 
   const whereConditions = andConditions.length > 0 ? { AND: andConditions } : {};
@@ -152,13 +174,18 @@ const getAllTechnicians = async (query: any) => {
     };
   });
 
+  let filteredData = dataWithRatings;
+  if (minRating) {
+    filteredData = filteredData.filter(profile => profile.averageRating >= Number(minRating));
+  }
+
   return {
     meta: {
       page: Number(page),
       limit: Number(limit),
-      total,
+      total: minRating ? filteredData.length : total,
     },
-    data: dataWithRatings,
+    data: filteredData,
   };
 };
 
