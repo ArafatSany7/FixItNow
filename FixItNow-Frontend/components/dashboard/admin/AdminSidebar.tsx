@@ -30,10 +30,10 @@ export function AdminSidebar() {
   return (
     <>
 
-      <div className="md:hidden flex items-center justify-between bg-background border border-secondary/20 rounded-2xl p-4 shadow-sm mb-6">
-        <h2 className="text-xl font-bold text-text">Admin Panel</h2>
-        <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
-          <Menu className="h-6 w-6" />
+      <div className="md:hidden flex items-center justify-between bg-background border border-secondary/20 rounded-xl p-4 shadow-sm mb-4">
+        <h2 className="text-lg font-bold text-text truncate">Admin Panel</h2>
+        <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)} className="shrink-0">
+          <Menu className="h-5 w-5" />
         </Button>
       </div>
 

@@ -60,7 +60,7 @@ export default async function CustomerDashboardOverview() {
 
       <div className="pt-6 border-t border-secondary/20">
         <h2 className="text-xl font-bold text-text mb-4">Recent Bookings</h2>
-        <BookingHistory initialBookings={bookings} />
+        <BookingHistory initialBookings={bookings.slice(0, 3)} />
       </div>
     </div>
   );

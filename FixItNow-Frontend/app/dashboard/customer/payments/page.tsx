@@ -32,9 +32,9 @@ export default async function PaymentsPage() {
         <p className="text-text/60">View your generated invoices and payment statuses.</p>
       </div>
 
-      <div className="overflow-x-auto pt-4">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-secondary/10 text-text/70 border-b border-secondary/20">
+      <div className="overflow-x-hidden pt-4">
+        <table className="w-full text-left text-sm block md:table">
+          <thead className="bg-secondary/10 text-text/70 border-b border-secondary/20 hidden md:table-header-group">
             <tr>
               <th className="p-4 font-semibold">Transaction ID</th>
               <th className="p-4 font-semibold">Booking ID</th>
@@ -42,20 +42,30 @@ export default async function PaymentsPage() {
               <th className="p-4 font-semibold">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-secondary/10">
+          <tbody className="block md:table-row-group">
             {bookingsWithPayments.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="p-8 text-center text-text/60">
+              <tr className="block md:table-row">
+                <td colSpan={4} className="p-8 text-center text-text/60 block md:table-cell">
                   No payment history found.
                 </td>
               </tr>
             ) : (
               bookingsWithPayments.map((booking: any) => (
-                <tr key={booking.payment.id} className="hover:bg-secondary/5 transition-colors">
-                  <td className="p-4 font-medium text-text">{booking.payment.transactionId}</td>
-                  <td className="p-4 text-text/80">{booking.id.split("-")[0]}</td>
-                  <td className="p-4 font-semibold text-text">${booking.payment.amount}</td>
-                  <td className="p-4">
+                <tr key={booking.payment.id} className="block md:table-row border border-secondary/20 md:border-none rounded-xl md:rounded-none mb-4 md:mb-0 hover:bg-secondary/5 transition-colors bg-secondary/5 md:bg-transparent overflow-hidden">
+                  <td className="flex justify-between items-center md:table-cell p-3 md:p-4 border-b border-secondary/10 md:border-none">
+                    <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Transaction ID</span>
+                    <span className="font-medium text-text truncate max-w-[150px] sm:max-w-none">{booking.payment.transactionId}</span>
+                  </td>
+                  <td className="flex justify-between items-center md:table-cell p-3 md:p-4 border-b border-secondary/10 md:border-none">
+                    <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Booking ID</span>
+                    <span className="text-text/80">{booking.id.split("-")[0]}</span>
+                  </td>
+                  <td className="flex justify-between items-center md:table-cell p-3 md:p-4 border-b border-secondary/10 md:border-none">
+                    <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Amount</span>
+                    <span className="font-semibold text-text">${booking.payment.amount}</span>
+                  </td>
+                  <td className="flex justify-between items-center md:table-cell p-3 md:p-4">
+                    <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Status</span>
                     <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
                       booking.payment.status === "PAID" 
                         ? "bg-green-500/10 text-green-600 border border-green-500/20" 

@@ -97,12 +97,12 @@ export function UserManagement({ initialUsers = [], meta = { page: 1, limit: 10,
         <table className="w-full text-left text-sm">
           <thead className="bg-secondary/5 text-text/70 border-b border-secondary/20">
             <tr>
-              <th className="p-4 font-semibold">User ID</th>
-              <th className="p-4 font-semibold">Name</th>
-              <th className="p-4 font-semibold">Email</th>
-              <th className="p-4 font-semibold">Role</th>
-              <th className="p-4 font-semibold">Status</th>
-              <th className="p-4 font-semibold text-right">Action</th>
+              <th className="p-3 md:p-4 font-semibold hidden sm:table-cell">User ID</th>
+              <th className="p-3 md:p-4 font-semibold">Name</th>
+              <th className="p-3 md:p-4 font-semibold hidden md:table-cell">Email</th>
+              <th className="p-3 md:p-4 font-semibold">Role</th>
+              <th className="p-3 md:p-4 font-semibold">Status</th>
+              <th className="p-3 md:p-4 font-semibold text-right">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-secondary/10">
@@ -113,22 +113,27 @@ export function UserManagement({ initialUsers = [], meta = { page: 1, limit: 10,
             ) : (
               users.map((user) => (
                 <tr key={user.id} className="hover:bg-secondary/5 transition-colors">
-                  <td className="p-4 font-medium text-text">{user.id.split("-")[0]}</td>
-                  <td className="p-4 text-text/80">{user.name}</td>
-                  <td className="p-4 text-text/80">{user.email}</td>
-                  <td className="p-4">
+                  <td className="p-3 md:p-4 font-medium text-text hidden sm:table-cell">{user.id.split("-")[0]}</td>
+                  <td className="p-3 md:p-4 text-text/80">
+                    <div className="flex flex-col whitespace-nowrap">
+                      <span>{user.name}</span>
+                      <span className="text-xs text-text/50 md:hidden">{user.email}</span>
+                    </div>
+                  </td>
+                  <td className="p-3 md:p-4 text-text/80 hidden md:table-cell">{user.email}</td>
+                  <td className="p-3 md:p-4">
                     <span className={`px-2 py-1 rounded-md text-xs font-semibold ${user.role === "TECHNICIAN" ? "bg-primary/10 text-primary" : (user.role === "ADMIN" ? "bg-purple-500/10 text-purple-600" : "bg-secondary/20 text-text/80")
                       }`}>
                       {user.role}
                     </span>
                   </td>
-                  <td className="p-4">
+                  <td className="p-3 md:p-4">
                     <span className={`px-2 py-1 rounded-md text-xs font-semibold ${!user.isBanned ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
                       }`}>
                       {!user.isBanned ? "ACTIVE" : "BANNED"}
                     </span>
                   </td>
-                  <td className="p-4 text-right">
+                  <td className="p-3 md:p-4 text-right">
                     {user.role !== "ADMIN" && (
                       <Button
                         variant={!user.isBanned ? "outline" : "default"}

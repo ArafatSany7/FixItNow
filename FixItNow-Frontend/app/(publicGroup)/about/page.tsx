@@ -11,10 +11,10 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
 
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="flex flex-col md:flex-row gap-12 items-center mb-16">
+      <section className="container mx-auto px-4 py-10 md:py-24">
+        <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center mb-10 md:mb-16">
           <div className="flex-1">
-            <h1 className="text-4xl md:text-5xl font-bold text-text leading-tight mb-6">
+            <h1 className="text-3xl md:text-5xl font-bold text-text leading-tight mb-4 md:mb-6">
               Trusted By Thousands <br className="hidden md:block" />
               Of Homeowners.
             </h1>
@@ -30,26 +30,26 @@ export default function AboutPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-          <div className="bg-secondary/10 border border-secondary/20 rounded-3xl p-8 flex flex-col aspect-square md:aspect-auto md:h-80">
-            <h2 className="text-5xl font-bold text-secondary mb-2">15k+</h2>
-            <p className="text-text/80 text-lg font-medium">Homes Served</p>
-            <div className="flex-1 flex items-center">
-              <p className="text-text/80 font-bold">Across Multiple Cities And Neighborhoods</p>
+          <div className="bg-secondary/10 border border-secondary/20 rounded-3xl p-6 md:p-8 flex flex-col h-auto py-8 md:py-0 md:h-80">
+            <h2 className="text-4xl md:text-5xl font-bold text-secondary mb-2">15k+</h2>
+            <p className="text-text/80 text-base md:text-lg font-medium">Homes Served</p>
+            <div className="flex-1 flex items-end md:items-center mt-4 md:mt-0">
+              <p className="text-text/80 font-bold text-sm md:text-base">Across Multiple Cities And Neighborhoods</p>
             </div>
           </div>
 
 
-          <div className="bg-[#97c0d3]/10 border border-[#97c0d3]/20 rounded-3xl p-8 flex flex-col aspect-square md:aspect-auto md:h-80">
-            <h2 className="text-5xl font-bold text-[#97c0d3] mb-2">95%</h2>
-            <p className="text-text/80 text-lg font-medium">On-Time Service</p>
-            <div className="flex-1 flex items-center">
-              <p className="text-text/80 font-bold">We Value Your Time And Deliver As Promised</p>
+          <div className="bg-[#97c0d3]/10 border border-[#97c0d3]/20 rounded-3xl p-6 md:p-8 flex flex-col h-auto py-8 md:py-0 md:h-80">
+            <h2 className="text-4xl md:text-5xl font-bold text-[#97c0d3] mb-2">95%</h2>
+            <p className="text-text/80 text-base md:text-lg font-medium">On-Time Service</p>
+            <div className="flex-1 flex items-end md:items-center mt-4 md:mt-0">
+              <p className="text-text/80 font-bold text-sm md:text-base">We Value Your Time And Deliver As Promised</p>
             </div>
           </div>
 
 
-          <div className="relative rounded-3xl aspect-square md:aspect-auto md:h-80 border border-[#eab308]/20 bg-[#eab308]/10 mt-12 md:mt-0">
-            <div className="absolute -left-8 -right-8 -top-16 bottom-0 z-10 pointer-events-none">
+          <div className="relative rounded-3xl h-64 md:h-80 border border-[#eab308]/20 bg-[#eab308]/10 mt-8 md:mt-0">
+            <div className="absolute -left-4 -right-4 -top-12 md:-left-8 md:-right-8 md:-top-16 bottom-0 z-10 pointer-events-none">
               <Image
                 src="/NicePng_clash-of-clans-png_640054.png"
                 alt="Clash of Clans Builder 1"
@@ -60,9 +60,16 @@ export default function AboutPage() {
             </div>
           </div>
 
+          <div className="bg-primary/10 border border-primary/20 rounded-3xl p-6 md:hidden flex flex-col h-auto py-8 mt-8">
+            <h2 className="text-3xl font-bold text-primary mb-2">Expert Care</h2>
+            <p className="text-text/80 text-base font-medium">Your Home In Good Hands</p>
+            <div className="flex-1 flex items-end mt-4">
+              <p className="text-text/80 font-bold text-sm">Dedicated professionals ready to help you 24/7 with all your maintenance needs.</p>
+            </div>
+          </div>
 
-          <div className="relative rounded-3xl aspect-square md:aspect-auto md:h-80 border border-[#3b82f6]/20 bg-[#3b82f6]/10 mt-12 md:mt-0">
-            <div className="absolute -left-8 -right-8 -top-16 bottom-0 z-10 pointer-events-none">
+          <div className="relative rounded-3xl h-64 md:h-80 border border-[#3b82f6]/20 bg-[#3b82f6]/10 mt-8 md:mt-0">
+            <div className="absolute -left-4 -right-4 -top-12 md:-left-8 md:-right-8 md:-top-16 bottom-0 z-10 pointer-events-none">
               <Image
                 src="/NicePng_coc-troops-png_3623954.png"
                 alt="Clash of Clans Builder 2"
@@ -74,30 +81,30 @@ export default function AboutPage() {
           </div>
 
 
-          <div className="bg-[#97c0d3]/10 border border-[#97c0d3]/20 rounded-3xl p-8 flex flex-col aspect-square md:aspect-auto md:h-80">
-            <h2 className="text-5xl font-bold text-[#97c0d3] mb-2">500+</h2>
-            <p className="text-text/80 text-lg font-medium">Certified Professionals</p>
-            <div className="flex-1 flex items-center">
-              <p className="text-text/80 font-bold">Skilled, Trained, And Background-Checked</p>
+          <div className="bg-[#97c0d3]/10 border border-[#97c0d3]/20 rounded-3xl p-6 md:p-8 flex flex-col h-auto py-8 md:py-0 md:h-80">
+            <h2 className="text-4xl md:text-5xl font-bold text-[#97c0d3] mb-2">500+</h2>
+            <p className="text-text/80 text-base md:text-lg font-medium">Certified Professionals</p>
+            <div className="flex-1 flex items-end md:items-center mt-4 md:mt-0">
+              <p className="text-text/80 font-bold text-sm md:text-base">Skilled, Trained, And Background-Checked</p>
             </div>
           </div>
 
 
-          <div className="bg-[#97c0d3]/10 border border-[#97c0d3]/20 rounded-3xl p-8 flex flex-col aspect-square md:aspect-auto md:h-80">
-            <h2 className="text-5xl font-bold text-[#97c0d3] mb-2">4.9/5</h2>
-            <p className="text-text/80 text-lg font-medium">Customer Rating</p>
-            <div className="flex-1 flex items-center">
-              <p className="text-text/80 font-bold">Based On Thousands Of Verified Reviews</p>
+          <div className="bg-[#97c0d3]/10 border border-[#97c0d3]/20 rounded-3xl p-6 md:p-8 flex flex-col h-auto py-8 md:py-0 md:h-80">
+            <h2 className="text-4xl md:text-5xl font-bold text-[#97c0d3] mb-2">4.9/5</h2>
+            <p className="text-text/80 text-base md:text-lg font-medium">Customer Rating</p>
+            <div className="flex-1 flex items-end md:items-center mt-4 md:mt-0">
+              <p className="text-text/80 font-bold text-sm md:text-base">Based On Thousands Of Verified Reviews</p>
             </div>
           </div>
         </div>
       </section>
 
 
-      <section className="container mx-auto px-4 py-16 md:py-24">
+      <section className="container mx-auto px-4 py-10 md:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div className="relative rounded-3xl h-[500px] border border-[#8b5cf6]/20 bg-[#8b5cf6]/10 mt-16 md:mt-0">
-            <div className="absolute -left-12 -right-12 -top-20 bottom-0 z-10 pointer-events-none">
+          <div className="relative rounded-3xl h-[300px] md:h-[500px] border border-[#8b5cf6]/20 bg-[#8b5cf6]/10 mt-10 md:mt-0">
+            <div className="absolute -left-6 -right-6 -top-12 md:-left-12 md:-right-12 md:-top-20 bottom-0 z-10 pointer-events-none">
               <Image
                 src="/pngaaa.com-4146076.png"
                 alt="Clash of Clans Builder 3"
@@ -107,8 +114,8 @@ export default function AboutPage() {
               />
             </div>
           </div>
-          <div className="bg-accent/10 border border-accent/20 rounded-3xl p-10 h-full flex flex-col justify-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-text mb-6">
+          <div className="bg-accent/10 border border-accent/20 rounded-3xl p-6 md:p-10 h-full flex flex-col justify-center">
+            <h2 className="text-3xl md:text-5xl font-bold text-text mb-4 md:mb-6">
               The Reasons People Count On Us
             </h2>
             <p className="text-text/70 mb-8 text-lg">
@@ -143,9 +150,9 @@ export default function AboutPage() {
       </section>
 
 
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="flex flex-col md:flex-row gap-8 justify-between items-end mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-text max-w-xl">
+      <section className="container mx-auto px-4 py-10 md:py-24">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-8 justify-between items-start md:items-end mb-8 md:mb-12">
+          <h2 className="text-3xl md:text-5xl font-bold text-text max-w-xl">
             Loved By Thousands Of Happy Homeowners
           </h2>
           <p className="text-text/60 max-w-md pb-2">

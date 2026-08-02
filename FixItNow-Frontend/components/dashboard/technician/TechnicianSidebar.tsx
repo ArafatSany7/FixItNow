@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, Wallet, LogOut, Home, Briefcase, User, Menu, X } from "lucide-react";
+import { LayoutDashboard, CalendarDays, Wallet, LogOut, Home, Briefcase, User, Menu, X, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
@@ -23,6 +23,7 @@ export function TechnicianSidebar() {
     { href: "/", label: "Home", icon: Home },
     { href: "/dashboard/technician", label: "Booking Requests", icon: LayoutDashboard },
     { href: "/dashboard/technician/ongoing", label: "Ongoing Bookings", icon: Briefcase },
+    { href: "/dashboard/technician/history", label: "Booking History", icon: History },
     { href: "/dashboard/technician/availability", label: "Availability", icon: CalendarDays },
     { href: "/dashboard/technician/profile", label: "Profile & Services", icon: User },
   ];
@@ -30,10 +31,10 @@ export function TechnicianSidebar() {
   return (
     <>
 
-      <div className="md:hidden flex items-center justify-between bg-background border border-secondary/20 rounded-2xl p-4 shadow-sm mb-6">
-        <h2 className="text-xl font-bold text-text">Technician Portal</h2>
-        <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
-          <Menu className="h-6 w-6" />
+      <div className="md:hidden flex items-center justify-between bg-background border border-secondary/20 rounded-xl p-4 shadow-sm mb-4">
+        <h2 className="text-lg font-bold text-text truncate">Technician Portal</h2>
+        <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)} className="shrink-0">
+          <Menu className="h-5 w-5" />
         </Button>
       </div>
 

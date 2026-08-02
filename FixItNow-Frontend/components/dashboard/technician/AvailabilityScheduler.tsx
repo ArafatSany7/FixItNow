@@ -83,40 +83,43 @@ export function AvailabilityScheduler() {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center bg-secondary/5 border border-secondary/20 p-5 rounded-xl">
+      <div className="bg-secondary/5 border border-secondary/20 p-5 rounded-xl">
         <div>
           <h2 className="text-lg font-bold text-text">Weekly Schedule</h2>
           <p className="text-sm text-text/60 mt-1">Select the time slots you are available for booking.</p>
         </div>
-        <Button onClick={handleSave} disabled={isSaving} className="bg-primary text-background hover:bg-primary/90 shadow-sm h-10 px-6">
-          {isSaving ? "Saving..." : "Save Changes"}
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {daysOfWeek.map(day => (
           <div key={day} className="bg-background border border-secondary/20 rounded-2xl p-5 shadow-sm">
             <h3 className="text-base font-bold text-text mb-4 border-b border-secondary/20 pb-2">{day}</h3>
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3">
               {timeSlots.map(time => {
                 const isSelected = availability[day]?.includes(time);
                 return (
                   <button
                     key={time}
                     onClick={() => toggleSlot(day, time)}
-                    className={`flex items-center gap-2 py-2 px-3 rounded-lg border text-sm font-medium transition-all ${isSelected
+                    className={`flex items-center justify-center gap-2 py-2 px-2 sm:px-3 rounded-lg border text-xs sm:text-sm font-medium transition-all ${isSelected
                         ? "border-primary bg-primary/10 text-primary shadow-sm"
                         : "border-secondary/30 bg-transparent text-text hover:border-primary/50"
                       }`}
                   >
-                    {isSelected ? <Check className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5 opacity-50" />}
-                    {time}
+                    {isSelected ? <Check className="h-3.5 w-3.5 shrink-0" /> : <Clock className="h-3.5 w-3.5 shrink-0 opacity-50" />}
+                    <span className="whitespace-nowrap">{time}</span>
                   </button>
                 );
               })}
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="flex justify-end pt-6 mt-4 border-t border-secondary/20">
+        <Button onClick={handleSave} disabled={isSaving} className="bg-primary text-background hover:bg-primary/90 shadow-sm h-12 px-10 w-full sm:w-auto text-base">
+          {isSaving ? "Saving..." : "Save Changes"}
+        </Button>
       </div>
     </div>
   );

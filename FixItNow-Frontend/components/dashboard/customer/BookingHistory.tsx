@@ -177,9 +177,9 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm">
-        <thead className="bg-secondary/10 text-text/70 border-b border-secondary/20">
+    <div className="overflow-x-hidden">
+      <table className="w-full text-left text-sm block md:table">
+        <thead className="bg-secondary/10 text-text/70 border-b border-secondary/20 hidden md:table-header-group">
           <tr>
             <th className="p-4 font-semibold">Booking ID</th>
             <th className="p-4 font-semibold">Technician</th>
@@ -188,27 +188,35 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
             <th className="p-4 font-semibold text-right">Action</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-secondary/10">
+        <tbody className="block md:table-row-group">
           {bookings.map((booking) => (
-            <tr key={booking.id} className="hover:bg-secondary/5 transition-colors">
-              <td className="p-4 font-medium text-text">{booking.id.split("-")[0]}</td>
-              <td className="p-4 text-text/80">{booking.technician?.name || "Unknown"}</td>
-              <td className="p-4 text-text/80">
-                <div className="flex flex-col">
+            <tr key={booking.id} className="block md:table-row border border-secondary/20 md:border-none rounded-xl md:rounded-none mb-4 md:mb-0 hover:bg-secondary/5 transition-colors bg-secondary/5 md:bg-transparent overflow-hidden">
+              <td className="flex justify-between items-center md:table-cell p-3 md:p-4 border-b border-secondary/10 md:border-none">
+                <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Booking ID</span>
+                <span className="font-medium text-text">{booking.id.split("-")[0]}</span>
+              </td>
+              <td className="flex justify-between items-center md:table-cell p-3 md:p-4 border-b border-secondary/10 md:border-none">
+                <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Technician</span>
+                <span className="text-text/80">{booking.technician?.name || "Unknown"}</span>
+              </td>
+              <td className="flex justify-between items-center md:table-cell p-3 md:p-4 border-b border-secondary/10 md:border-none">
+                <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Date & Time</span>
+                <div className="flex flex-col text-right md:text-left whitespace-nowrap text-text/80">
                   <span>{new Date(booking.date).toLocaleDateString()}</span>
                   <span className="text-xs text-text/50">{booking.timeSlot}</span>
                 </div>
               </td>
-              <td className="p-4">
+              <td className="flex justify-between items-center md:table-cell p-3 md:p-4 border-b border-secondary/10 md:border-none">
+                <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Status</span>
                 {getStatusBadge(booking.status, booking.payment?.status)}
               </td>
-              <td className="p-4 text-right">
-                <div className="flex justify-end gap-3 items-center">
+              <td className="flex flex-col sm:flex-row justify-end gap-2 md:table-cell p-3 md:p-4 md:text-right bg-background md:bg-transparent">
+                <div className="flex justify-end gap-2 items-center flex-wrap w-full md:w-auto">
                   {(booking.status === "PENDING" || booking.status === "REQUESTED" || (booking.status === "ACCEPTED" && booking.payment?.status !== "PAID")) && (
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                      className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white flex-1 md:flex-none"
                       onClick={() => handleCancel(booking.id)}
                       disabled={isProcessing === `${booking.id}-cancel`}
                     >
@@ -218,18 +226,25 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
                   {booking.status === "ACCEPTED" && booking.payment?.status !== "PAID" && (
                     <Button
                       size="sm"
-                      className="bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-500/20"
+                      className="bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-500/20 flex-1 md:flex-none"
                       onClick={() => handlePayment(booking.id)}
                       disabled={isProcessing === `${booking.id}-pay`}
                     >
                       {isProcessing === `${booking.id}-pay` ? "Processing..." : "Pay Now"}
                     </Button>
                   )}
+                  {booking.payment?.status === "PAID" && booking.status !== "COMPLETED" && (
+                    <span className="text-xs font-semibold text-green-600 bg-green-500/10 px-2.5 py-1.5 rounded-md border border-green-500/20 md:hidden ml-auto">
+                      Paid
+                    </span>
+                  )}
                 </div>
                 {booking.payment?.status === "PAID" && booking.status !== "COMPLETED" && (
-                  <span className="text-xs font-semibold text-green-600 bg-green-500/10 px-2.5 py-1.5 rounded-md border border-green-500/20">
-                    Paid
-                  </span>
+                  <div className="hidden md:block">
+                    <span className="text-xs font-semibold text-green-600 bg-green-500/10 px-2.5 py-1.5 rounded-md border border-green-500/20">
+                      Paid
+                    </span>
+                  </div>
                 )}
 
                 {booking.status === "COMPLETED" && (

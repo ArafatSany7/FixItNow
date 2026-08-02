@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { OngoingBookings } from "@/components/dashboard/technician/OngoingBookings";
+import { TechnicianBookingHistory } from "@/components/dashboard/technician/TechnicianBookingHistory";
 
 async function getIncomingBookings() {
   const token = cookies().get("accessToken")?.value;
@@ -21,21 +21,22 @@ async function getIncomingBookings() {
   }
 }
 
-export default async function OngoingBookingsPage() {
+export default async function TechnicianHistoryPage() {
   const allBookings = await getIncomingBookings();
 
-
-  const ongoingBookings = allBookings.filter((b: any) => b.status === "ACCEPTED" || b.status === "IN_PROGRESS");
+  const historyBookings = allBookings.filter((b: any) =>
+    b.status === "COMPLETED" || b.status === "CANCELLED" || b.status === "DECLINED"
+  );
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-text">Ongoing Bookings</h1>
-        <p className="text-text/60">View your accepted jobs and check their payment status.</p>
+        <h1 className="text-2xl font-bold text-text">Booking History</h1>
+        <p className="text-text/60">View your past completed, cancelled, and declined jobs.</p>
       </div>
 
       <div className="pt-2">
-        <OngoingBookings bookings={ongoingBookings} />
+        <TechnicianBookingHistory initialBookings={historyBookings} />
       </div>
     </div>
   );

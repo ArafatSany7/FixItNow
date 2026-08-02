@@ -152,7 +152,7 @@ export function Navbar() {
                   </>
                 ) : userRole ? (
                   <>
-                    <Button variant="outline" asChild className="w-full justify-center border-secondary text-text hover:bg-secondary/20">
+                    <Button variant="outline" asChild className="w-full justify-center border-secondary text-text bg-transparent hover:bg-secondary/20">
                       <Link href={getDashboardLink()} onClick={() => setIsMobileMenuOpen(false)}>
                         <LayoutDashboard className="w-4 h-4 mr-2" />
                         Dashboard
