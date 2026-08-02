@@ -178,7 +178,7 @@ const getSingleTechnician = async (id: string) => {
           technicianBookings: {
             where: {
               status: {
-                notIn: ['CANCELLED', 'DECLINED']
+                notIn: ['CANCELLED', 'DECLINED', 'COMPLETED']
               }
             },
             select: {
