@@ -119,7 +119,7 @@ export function ReviewModal({ isOpen, onClose, bookingId, onSuccess }: ReviewMod
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="Tell us what you liked or what could be improved..."
-            className="w-full min-h-[120px] p-3 text-sm bg-secondary/5 border border-secondary/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 text-text placeholder:text-text/40 resize-y"
+            className="w-full min-h-[120px] p-3 text-sm bg-background border border-secondary/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 text-text placeholder:text-text/40 resize-y"
           />
 
           <div className="flex flex-col sm:flex-row gap-3 mt-6">

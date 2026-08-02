@@ -132,7 +132,10 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
           'Content-Type': 'application/json',
           Authorization: token || '',
         },
-        body: JSON.stringify({ bookingId })
+        body: JSON.stringify({ 
+          bookingId,
+          frontendUrl: window.location.origin
+        })
       });
 
       if (!res.ok) {

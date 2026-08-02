@@ -58,13 +58,15 @@ const createPayment = async (userEmail: string, payload: any) => {
     });
   }
 
+  const frontendUrl = payload.frontendUrl || 'https://fixit-now-service.vercel.app';
+
   const data = {
     total_amount: amount,
     currency: 'BDT',
     tran_id: transactionId,
-    success_url: `${config.ssl.app_url}/api/payments/confirm?action=success&tran_id=${transactionId}`,
-    fail_url: `${config.ssl.app_url}/api/payments/confirm?action=fail&tran_id=${transactionId}`,
-    cancel_url: `${config.ssl.app_url}/api/payments/confirm?action=cancel&tran_id=${transactionId}`,
+    success_url: `${config.ssl.app_url}/api/payments/confirm?action=success&tran_id=${transactionId}&frontendUrl=${encodeURIComponent(frontendUrl)}`,
+    fail_url: `${config.ssl.app_url}/api/payments/confirm?action=fail&tran_id=${transactionId}&frontendUrl=${encodeURIComponent(frontendUrl)}`,
+    cancel_url: `${config.ssl.app_url}/api/payments/confirm?action=cancel&tran_id=${transactionId}&frontendUrl=${encodeURIComponent(frontendUrl)}`,
     ipn_url: `${config.ssl.app_url}/api/payments/confirm?action=ipn&tran_id=${transactionId}`,
     shipping_method: 'Courier',
     product_name: 'Service Booking',
@@ -101,7 +103,7 @@ const createPayment = async (userEmail: string, payload: any) => {
   });
 };
 
-const confirmPayment = async (tranId: string, action: string) => {
+const confirmPayment = async (tranId: string, action: string, frontendUrl: string) => {
   const payment = await prisma.payment.findUnique({ where: { transactionId: tranId } });
   if (!payment) throw new ApiError(httpStatus.NOT_FOUND, 'Payment not found');
 
@@ -148,7 +150,7 @@ const confirmPayment = async (tranId: string, action: string) => {
             }, 2000);
           } else {
             setTimeout(() => {
-              window.location.href = "https://fixitnow-eight.vercel.app/dashboard/customer";
+              window.location.href = "${frontendUrl}/dashboard/customer";
             }, 2000);
           }
         </script>

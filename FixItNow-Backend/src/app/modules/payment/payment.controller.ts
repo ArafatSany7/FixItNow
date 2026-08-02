@@ -18,7 +18,7 @@ const createPayment = catchAsync(async (req: Request, res: Response) => {
 
 const confirmPayment = catchAsync(async (req: Request, res: Response) => {
   const tran_id = req.query.tran_id || req.body.tran_id;
-  
+
   let action = req.query.action as string;
   if (!action && req.body.status) {
     if (req.body.status === 'VALID') action = 'success';
@@ -30,7 +30,8 @@ const confirmPayment = catchAsync(async (req: Request, res: Response) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Transaction ID is missing. Please provide ?tran_id=YOUR_TXN_ID in the URL');
   }
 
-  const result = await PaymentService.confirmPayment(tran_id as string, action || 'success');
+  const frontendUrl = (req.query.frontendUrl as string) || 'https://fixit-now-service.vercel.app';
+  const result = await PaymentService.confirmPayment(tran_id as string, action || 'success', frontendUrl);
   res.send(result);
 });
 
