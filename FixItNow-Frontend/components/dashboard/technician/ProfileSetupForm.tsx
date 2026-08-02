@@ -295,7 +295,7 @@ export function ProfileSetupForm() {
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="e.g., New York, NY or Downtown Area"
+            placeholder="e.g., Uttara, Mirpur, Dhanmondi..."
             className="bg-transparent border-secondary/30"
           />
           <p className="text-xs text-text/50 mt-1">Leave empty to show as "Available locally".</p>
