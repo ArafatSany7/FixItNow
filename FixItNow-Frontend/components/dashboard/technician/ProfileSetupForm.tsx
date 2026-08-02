@@ -26,7 +26,7 @@ export function ProfileSetupForm() {
     const fetchData = async () => {
       try {
         const token = Cookies.get("accessToken");
-        // Fetch Categories
+
         const catRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/categories`, {
           cache: 'no-store'
         });
@@ -39,7 +39,6 @@ export function ProfileSetupForm() {
           }
         }
 
-        // Fetch Existing Profile
         if (token) {
           const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/users/profile`, {
             headers: { Authorization: token },
@@ -49,7 +48,7 @@ export function ProfileSetupForm() {
           if (profileData.data) {
             const user = profileData.data;
             if (user.profileImg) setProfileImg(user.profileImg);
-            
+
             if (user.technicianProfile) {
               const tech = user.technicianProfile;
               setCategoryId(tech.categoryId || defaultCategoryId);
@@ -156,7 +155,7 @@ export function ProfileSetupForm() {
         const formData = new FormData();
         formData.append('file', selectedFile);
         formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'fixitnow');
-        
+
         try {
           const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'demo'}/image/upload`, {
             method: 'POST',
@@ -167,9 +166,9 @@ export function ProfileSetupForm() {
             finalProfileImg = uploadData.secure_url;
             toast.dismiss("uploading-image");
           } else {
-             toast.error("Cloudinary upload failed", { id: "uploading-image" });
+            toast.error("Cloudinary upload failed", { id: "uploading-image" });
           }
-        } catch(e) {
+        } catch (e) {
           toast.error("Failed to upload to Cloudinary", { id: "uploading-image" });
         }
       }
@@ -183,7 +182,7 @@ export function ProfileSetupForm() {
           },
           body: JSON.stringify({ profileImg: finalProfileImg })
         });
-        
+
         if (!imgRes.ok) {
           toast.error("Profile saved, but picture failed to upload to backend. Try an image URL.");
         }

@@ -12,7 +12,7 @@ async function getIncomingBookings() {
       },
       cache: 'no-store'
     });
-    
+
     if (!res.ok) return [];
     const data = await res.json();
     return data?.data || [];
@@ -23,8 +23,7 @@ async function getIncomingBookings() {
 
 export default async function TechnicianDashboardOverview() {
   const allBookings = await getIncomingBookings();
-  
-  // Calculate stats
+
   const pendingRequests = allBookings.filter((b: any) => b.status === "PENDING");
   const completedJobs = allBookings.filter((b: any) => b.status === "COMPLETED").length;
   const totalEarnings = allBookings.reduce((sum: number, b: any) => {

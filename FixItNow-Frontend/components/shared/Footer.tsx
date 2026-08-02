@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Wrench, Mail, Phone, MapPin } from "lucide-react";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
+import { FAQModal } from "./FAQModal";
 
 export function Footer() {
   return (
@@ -30,7 +31,7 @@ export function Footer() {
               <li><Link href="/" className="hover:text-primary transition-colors">Home</Link></li>
               <li><Link href="/services" className="hover:text-primary transition-colors">All Services</Link></li>
               <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
+              <li><Link href="https://arafat-sany.vercel.app/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Contact</Link></li>
             </ul>
           </div>
 
@@ -38,7 +39,11 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="text-sm font-semibold text-text uppercase tracking-wider">Support</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/faq" className="hover:text-primary transition-colors">FAQ</Link></li>
+              <li>
+                <FAQModal>
+                  <button className="hover:text-primary transition-colors">FAQ</button>
+                </FAQModal>
+              </li>
               <li><Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
               <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
             </ul>
