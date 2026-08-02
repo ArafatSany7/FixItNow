@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 
 interface BookingCalendarProps {
   technicianId: string;
@@ -54,6 +55,19 @@ export function BookingCalendar({ technicianId, availability = {}, technicianBoo
     const token = Cookies.get("accessToken");
 
     if (!token) {
+      setIsAuthModalOpen(true);
+      setIsBooking(false);
+      return;
+    }
+
+    try {
+      const decoded: any = jwtDecode(token);
+      if (decoded.role !== "CUSTOMER") {
+        setIsAuthModalOpen(true);
+        setIsBooking(false);
+        return;
+      }
+    } catch (e) {
       setIsAuthModalOpen(true);
       setIsBooking(false);
       return;
