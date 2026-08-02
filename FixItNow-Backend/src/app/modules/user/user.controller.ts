@@ -27,13 +27,28 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.getAllUsers();
+  const { search, role, page, limit, sortBy, sortOrder } = req.query;
+
+  const filters = {
+    ...(search && { search }),
+    ...(role && { role }),
+  };
+
+  const options = {
+    ...(page && { page: Number(page) }),
+    ...(limit && { limit: Number(limit) }),
+    ...(sortBy && { sortBy }),
+    ...(sortOrder && { sortOrder }),
+  };
+
+  const result = await UserService.getAllUsers(filters, options);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Users retrieved successfully',
-    data: result,
+    meta: result.meta,
+    data: result.data,
   });
 });
 

@@ -40,7 +40,7 @@ const getStatusBadge = (status: string, paymentStatus?: string) => {
 
 export function BookingMonitoring({ initialBookings = [], showAll = false, customTitle }: { initialBookings?: Booking[], showAll?: boolean, customTitle?: string }) {
 
-  const activeBookings = showAll ? initialBookings : initialBookings.filter(b => b.status !== "COMPLETED");
+  const activeBookings = showAll ? initialBookings : initialBookings.filter(b => !["COMPLETED", "DECLINED", "CANCELLED"].includes(b.status));
   const displayedBookings = showAll ? activeBookings : activeBookings.slice(0, 10);
 
   return (

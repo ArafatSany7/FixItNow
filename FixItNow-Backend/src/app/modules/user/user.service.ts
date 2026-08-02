@@ -36,21 +36,58 @@ const updateMyProfile = async (email: string, payload: any) => {
   return userData;
 };
 
-const getAllUsers = async () => {
+const getAllUsers = async (filters: any, options: any) => {
+  const { search, ...filterData } = filters;
+  const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc' } = options;
+  const skip = (page - 1) * limit;
+
+  const andConditions: any[] = [
+    { role: { in: ['CUSTOMER', 'TECHNICIAN'] } }
+  ];
+
+  if (search) {
+    andConditions.push({
+      OR: [
+        { name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+      ],
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map(key => ({
+        [key]: { equals: filterData[key] },
+      })),
+    });
+  }
+
+  const whereConditions = { AND: andConditions };
+
   const users = await prisma.user.findMany({
-    where: {
-      role: {
-        in: ['CUSTOMER', 'TECHNICIAN'],
-      },
+    where: whereConditions,
+    skip,
+    take: Number(limit),
+    orderBy: {
+      [sortBy]: sortOrder,
     },
   });
   
+  const total = await prisma.user.count({ where: whereConditions });
+
   const result = users.map(user => {
     const { password, ...userData } = user;
     return userData;
   });
 
-  return result;
+  return {
+    meta: {
+      page: Number(page),
+      limit: Number(limit),
+      total,
+    },
+    data: result,
+  };
 };
 
 const changeUserStatus = async (id: string, isBanned: boolean) => {

@@ -6,25 +6,26 @@ export const metadata = {
   description: "Manage platform users and technicians",
 };
 
-async function getAllUsers() {
+async function getAllUsers(searchParams: any) {
   const token = cookies().get("accessToken")?.value;
-  if (!token) return [];
+  if (!token) return { data: [], meta: { page: 1, limit: 10, total: 0 } };
 
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://fixitnow-theta.vercel.app/api"}/users`, {
+    const params = new URLSearchParams(searchParams);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://fixitnow-theta.vercel.app/api"}/users?${params.toString()}`, {
       headers: { Authorization: token },
       cache: "no-store",
     });
-    if (!res.ok) return [];
+    if (!res.ok) return { data: [], meta: { page: 1, limit: 10, total: 0 } };
     const data = await res.json();
-    return data?.data || [];
+    return { data: data?.data || [], meta: data?.meta || { page: 1, limit: 10, total: 0 } };
   } catch (error) {
-    return [];
+    return { data: [], meta: { page: 1, limit: 10, total: 0 } };
   }
 }
 
-export default async function AdminUsersPage() {
-  const users = await getAllUsers();
+export default async function AdminUsersPage({ searchParams }: { searchParams: any }) {
+  const { data: users, meta } = await getAllUsers(searchParams);
 
   return (
     <div className="space-y-6">
@@ -34,7 +35,7 @@ export default async function AdminUsersPage() {
       </div>
 
       <div className="pt-2">
-        <UserManagement initialUsers={users} />
+        <UserManagement initialUsers={users} meta={meta} />
       </div>
     </div>
   );
