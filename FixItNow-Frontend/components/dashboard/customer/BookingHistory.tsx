@@ -89,7 +89,7 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
 
   const handleCancel = async (id: string) => {
     try {
-      setIsProcessing(id);
+      setIsProcessing(`${id}-cancel`);
       const token = Cookies.get("accessToken");
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://fixitnow-theta.vercel.app/api"}/bookings/${id}/cancel`, {
@@ -123,7 +123,7 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
   const handlePayment = async (bookingId: string) => {
     const paymentWindow = window.open('about:blank', '_blank', 'width=800,height=600');
     try {
-      setIsProcessing(bookingId);
+      setIsProcessing(`${bookingId}-pay`);
       const token = Cookies.get("accessToken");
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://fixitnow-theta.vercel.app/api'}/payments/create`, {
@@ -142,8 +142,12 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
 
       const data = await res.json();
 
-      if (data.data?.url && paymentWindow) {
-        paymentWindow.location.href = data.data.url;
+      if (data.data?.url) {
+        if (paymentWindow) {
+          paymentWindow.location.href = data.data.url;
+        } else {
+          window.location.href = data.data.url;
+        }
       } else if (paymentWindow) {
         paymentWindow.close();
       }
@@ -196,27 +200,29 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
                 {getStatusBadge(booking.status, booking.payment?.status)}
               </td>
               <td className="p-4 text-right">
-                {(booking.status === "PENDING" || booking.status === "REQUESTED" || (booking.status === "ACCEPTED" && booking.payment?.status !== "PAID")) && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                    onClick={() => handleCancel(booking.id)}
-                    disabled={isProcessing === booking.id}
-                  >
-                    {isProcessing === booking.id ? "Canceling..." : "Cancel"}
-                  </Button>
-                )}
-                {booking.status === "ACCEPTED" && booking.payment?.status !== "PAID" && (
-                  <Button
-                    size="sm"
-                    className="bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-500/20"
-                    onClick={() => handlePayment(booking.id)}
-                    disabled={isProcessing === booking.id}
-                  >
-                    {isProcessing === booking.id ? "Processing..." : "Pay Now"}
-                  </Button>
-                )}
+                <div className="flex justify-end gap-3 items-center">
+                  {(booking.status === "PENDING" || booking.status === "REQUESTED" || (booking.status === "ACCEPTED" && booking.payment?.status !== "PAID")) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                      onClick={() => handleCancel(booking.id)}
+                      disabled={isProcessing === `${booking.id}-cancel`}
+                    >
+                      {isProcessing === `${booking.id}-cancel` ? "Canceling..." : "Cancel"}
+                    </Button>
+                  )}
+                  {booking.status === "ACCEPTED" && booking.payment?.status !== "PAID" && (
+                    <Button
+                      size="sm"
+                      className="bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-500/20"
+                      onClick={() => handlePayment(booking.id)}
+                      disabled={isProcessing === `${booking.id}-pay`}
+                    >
+                      {isProcessing === `${booking.id}-pay` ? "Processing..." : "Pay Now"}
+                    </Button>
+                  )}
+                </div>
                 {booking.payment?.status === "PAID" && booking.status !== "COMPLETED" && (
                   <span className="text-xs font-semibold text-green-600 bg-green-500/10 px-2.5 py-1.5 rounded-md border border-green-500/20">
                     Paid

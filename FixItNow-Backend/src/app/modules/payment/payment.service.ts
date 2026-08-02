@@ -143,10 +143,14 @@ const confirmPayment = async (tranId: string, action: string) => {
               type: "payment_success", 
               bookingId: "${payment.bookingId}" 
             }), "*");
+            setTimeout(() => {
+              window.close();
+            }, 2000);
+          } else {
+            setTimeout(() => {
+              window.location.href = "https://fixitnow-eight.vercel.app/dashboard/customer";
+            }, 2000);
           }
-          setTimeout(() => {
-            window.close();
-          }, 2000);
         </script>
       </body>
     </html>
