@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Users, Briefcase, DollarSign, Activity } from "lucide-react";
 
@@ -11,7 +11,7 @@ interface AdminStats {
 
 export function PlatformAnalytics({ initialStats }: { initialStats: AdminStats | null }) {
   const stats = [
-    { label: "Total Users", value: initialStats?.totalUsers || 0, icon: Users, trend: "+12% this month" },
+    { label: "Total Users", value: (initialStats?.totalUsers || 0) + (initialStats?.totalTechnicians || 0), icon: Users, trend: "+12% this month" },
     { label: "Total Technicians", value: initialStats?.totalTechnicians || 0, icon: Briefcase, trend: "+5% this month" },
     { label: "Total Bookings", value: initialStats?.totalBookings || 0, icon: Activity, trend: "+18% this month" },
     { label: "Total Revenue", value: `$${initialStats?.totalRevenue || 0}`, icon: DollarSign, trend: "+24% this month" },

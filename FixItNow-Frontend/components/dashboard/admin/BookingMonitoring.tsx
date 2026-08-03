@@ -56,8 +56,8 @@ export function BookingMonitoring({ initialBookings = [], showAll = false, custo
         )}
       </div>
       <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
-        <table className="w-full text-left text-sm relative">
-          <thead className="bg-secondary/5 text-text/70 border-b border-secondary/20 sticky top-0 backdrop-blur-sm z-10">
+        <table className="w-full text-left text-sm relative border-collapse">
+          <thead className="bg-secondary/5 text-text/70 border-b border-secondary/20 sticky top-0 backdrop-blur-sm z-10 hidden md:table-header-group">
             <tr>
               <th className="p-4 font-semibold">ID</th>
               <th className="p-4 font-semibold">Customer</th>
@@ -67,23 +67,38 @@ export function BookingMonitoring({ initialBookings = [], showAll = false, custo
               <th className="p-4 font-semibold">Amount</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-secondary/10">
+          <tbody className="divide-y divide-secondary/10 flex flex-col md:table-row-group gap-4 md:gap-0 p-4 md:p-0">
             {displayedBookings.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="p-8 text-center text-text/60">No bookings found.</td>
+              <tr className="block md:table-row">
+                <td colSpan={6} className="p-8 text-center text-text/60 block md:table-cell">No bookings found.</td>
               </tr>
             ) : (
               displayedBookings.map((booking) => (
-                <tr key={booking.id} className="border-b border-secondary/10 hover:bg-secondary/5 transition-colors">
-                  <td className="p-4 font-medium text-text">{booking.id.slice(0, 8)}</td>
-                  <td className="p-4 text-text/80">{booking.customer?.name || "N/A"}</td>
-                  <td className="p-4 text-text/80">{booking.technician?.name || "N/A"}</td>
-
-                  <td className="p-4 text-text/80">{booking.service?.title || (booking.technician as any)?.technicianProfile?.category?.title || "N/A"}</td>
-                  <td className="p-4">
+                <tr key={booking.id} className="bg-secondary/5 border border-secondary/20 md:border-none md:border-b md:border-secondary/10 md:bg-transparent rounded-xl flex flex-col md:table-row overflow-hidden hover:bg-secondary/5 transition-colors">
+                  <td className="p-3 md:p-4 font-medium text-text border-b border-secondary/10 md:border-none flex justify-between items-center md:table-cell">
+                    <span className="md:hidden font-semibold text-text/70 text-xs uppercase">ID</span>
+                    <span>{booking.id.slice(0, 8)}</span>
+                  </td>
+                  <td className="p-3 md:p-4 text-text/80 border-b border-secondary/10 md:border-none flex justify-between items-center md:table-cell text-right md:text-left">
+                    <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Customer</span>
+                    <span>{booking.customer?.name || "N/A"}</span>
+                  </td>
+                  <td className="p-3 md:p-4 text-text/80 border-b border-secondary/10 md:border-none flex justify-between items-center md:table-cell text-right md:text-left">
+                    <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Technician</span>
+                    <span>{booking.technician?.name || "N/A"}</span>
+                  </td>
+                  <td className="p-3 md:p-4 text-text/80 border-b border-secondary/10 md:border-none flex justify-between items-center md:table-cell text-right md:text-left">
+                    <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Service</span>
+                    <span className="truncate max-w-[200px] md:max-w-none">{booking.service?.title || (booking.technician as any)?.technicianProfile?.category?.title || "N/A"}</span>
+                  </td>
+                  <td className="p-3 md:p-4 border-b border-secondary/10 md:border-none flex justify-between items-center md:table-cell">
+                    <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Status</span>
                     {getStatusBadge(booking.status, (booking as any).payment?.status)}
                   </td>
-                  <td className="p-4 text-text font-medium">${booking.payment?.amount || 0}</td>
+                  <td className="p-3 md:p-4 text-text font-medium flex justify-between items-center md:table-cell">
+                    <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Amount</span>
+                    <span>${booking.payment?.amount || 0}</span>
+                  </td>
                 </tr>
               ))
             )}
