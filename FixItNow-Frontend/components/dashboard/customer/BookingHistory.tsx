@@ -234,14 +234,14 @@ export function BookingHistory({ initialBookings = [] }: BookingHistoryProps) {
                     </Button>
                   )}
                   {booking.payment?.status === "PAID" && booking.status !== "COMPLETED" && (
-                    <span className="text-xs font-semibold text-green-600 bg-green-500/10 px-2.5 py-1.5 rounded-md border border-green-500/20 md:hidden ml-auto">
+                    <span className="text-xs font-semibold text-purple-600 bg-purple-500/10 px-2.5 py-1.5 rounded-md border border-purple-500/20 md:hidden ml-auto">
                       Paid
                     </span>
                   )}
                 </div>
                 {booking.payment?.status === "PAID" && booking.status !== "COMPLETED" && (
                   <div className="hidden md:block">
-                    <span className="text-xs font-semibold text-green-600 bg-green-500/10 px-2.5 py-1.5 rounded-md border border-green-500/20">
+                    <span className="text-xs font-semibold text-purple-600 bg-purple-500/10 px-2.5 py-1.5 rounded-md border border-purple-500/20">
                       Paid
                     </span>
                   </div>

@@ -105,7 +105,7 @@ export function TechnicianBookingHistory({ initialBookings = [] }: TechnicianBoo
               <td className="flex justify-between items-center md:table-cell p-3 md:p-4 border-b border-secondary/10 md:border-none">
                 <span className="md:hidden font-semibold text-text/70 text-xs uppercase">Payment</span>
                 {booking.payment?.status === "PAID" ? (
-                    <span className="text-xs font-semibold text-green-600 bg-green-500/10 px-2.5 py-1.5 rounded-md border border-green-500/20">
+                    <span className="text-xs font-semibold text-purple-600 bg-purple-500/10 px-2.5 py-1.5 rounded-md border border-purple-500/20">
                       Paid
                     </span>
                 ) : (

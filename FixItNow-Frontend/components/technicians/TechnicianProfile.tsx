@@ -11,7 +11,11 @@ interface TechnicianProfileProps {
 }
 
 export function TechnicianProfile({ technician, reviews }: TechnicianProfileProps) {
-
+  const reviewCount = technician?.reviewCount || reviews?.length || 0;
+  const averageRating = technician?.averageRating || 
+    (reviews?.length > 0 
+      ? Number((reviews.reduce((acc: any, curr: any) => acc + (curr.rating || 0), 0) / reviews.length).toFixed(1)) 
+      : 0);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -41,8 +45,8 @@ export function TechnicianProfile({ technician, reviews }: TechnicianProfileProp
             <div className="flex flex-wrap items-center gap-4 text-sm text-text/70">
               <div className="flex items-center gap-1">
                 <Star className="h-4 w-4 fill-accent text-accent" />
-                <span className="font-bold text-text">{technician?.averageRating || 0}</span>
-                <span>({technician?.reviewCount || 0} reviews)</span>
+                <span className="font-bold text-text">{averageRating}</span>
+                <span>({reviewCount} reviews)</span>
               </div>
               <div className="flex items-center gap-1">
                 <MapPin className="h-4 w-4" />
