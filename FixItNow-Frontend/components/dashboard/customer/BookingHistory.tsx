@@ -34,7 +34,7 @@ interface BookingHistoryProps {
 
 const getStatusBadge = (status: string, paymentStatus?: string) => {
   if (status === "ACCEPTED" && paymentStatus === "PAID") {
-    return <span className="bg-purple-500/10 text-purple-600 border border-purple-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">Paid</span>;
+    return <span className="bg-green-500/10 text-green-600 border border-green-500/20 px-2.5 py-1 rounded-full text-xs font-semibold">In Progress</span>;
   }
 
   switch (status) {
